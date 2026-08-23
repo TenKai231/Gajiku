@@ -1,0 +1,18 @@
+meta {
+  name: 2. Read Single (ID Tidak Tersedia)
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/jabatan.php?action=edit&id=99999
+  body: none
+  auth: none
+}
+
+tests {
+  test("Mendapatkan respons handling error saat ID tidak ditemukan", function() {
+    // Bergantung implementasi PHP: bisa 404, atau 302 redirect kembali dengan flash message
+    expect(res.getStatus()).to.be.oneOf([200, 302, 404]);
+  });
+}

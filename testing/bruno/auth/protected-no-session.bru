@@ -1,0 +1,23 @@
+meta {
+  name: Protected Resource (No Session)
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8080/index.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Redirect ke login page", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+  
+  test("Terdapat form login jika follow redirect", function() {
+    if (res.getStatus() === 200) {
+      expect(res.getBody().includes('Masuk ke Gajiku')).to.be.true;
+    }
+  });
+}

@@ -1,0 +1,23 @@
+meta {
+  name: 1. Create Valid
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_jabatan: Manager IT
+  gaji_pokok: 12000000
+  tunjangan: 3000000
+}
+
+tests {
+  test("Redirect (302) atau sukses (200) kembali ke index saat valid", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

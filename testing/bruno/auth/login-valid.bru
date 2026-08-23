@@ -1,0 +1,36 @@
+meta {
+  name: Login Valid
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8080/login.php
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  username: admin
+  password: admin12345
+}
+
+tests {
+  test("Status code is 200 (sebenarnya 302 redirect, namun bruno/axios kadang mengikuti redirect otomatis ke index.php)", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+  
+  test("Mendapatkan PHPSESSID cookie", function() {
+    const cookies = res.getHeader('set-cookie');
+    let hasPhpSession = false;
+    
+    if (cookies) {
+      const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
+      hasPhpSession = cookieArray.some(c => c.includes('PHPSESSID='));
+    }
+    
+    if (res.getStatus() === 302) {
+      expect(hasPhpSession).to.be.true;
+    }
+  });
+}

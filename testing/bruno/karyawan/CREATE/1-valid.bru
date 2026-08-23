@@ -1,0 +1,26 @@
+meta {
+  name: 1. Create Valid
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nip: EMP-001
+  nama_lengkap: Budi Santoso
+  email: budi@gajiku.local
+  jabatan_id: 1
+  tanggal_masuk: 2026-01-10
+  status: Aktif
+}
+
+tests {
+  test("Redirect (302) atau sukses (200) kembali ke index saat valid", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

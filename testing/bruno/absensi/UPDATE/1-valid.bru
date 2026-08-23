@@ -1,0 +1,18 @@
+meta {
+  name: 1. Update Valid
+  type: http
+  seq: 1
+}
+post {
+  url: http://localhost:8080/absensi.php?action=edit&id=1
+  body: formUrlEncoded
+  auth: none
+}
+body:form-urlencoded {
+  status_absensi: Alpha
+}
+tests {
+  test("Berhasil update", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

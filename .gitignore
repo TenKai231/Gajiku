@@ -1,0 +1,50 @@
+# Environment
+.env
+
+# Dependencies
+vendor/
+node_modules/
+
+# Docker runtime data
+*.pid
+*.sock
+
+# Database runtime files and dumps
+*.sqlite
+*.sqlite3
+*.db
+*.sql.gz
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.idea/
+.vscode/
+*.suo
+*.user
+
+# Claude / Codex local files
+.claude/
+CLAUDE.md
+claude.md
+
+# Bruno API Testing secrets/environments
+bruno.json.user
+environments/*.env
+*.bru.env
+
+# Docker bind mount data (preventif)
+mariadb_data/
+mysql_data/

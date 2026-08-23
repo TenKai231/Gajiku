@@ -1,0 +1,19 @@
+meta {
+  name: 1. Generate Valid (Bulan Ini)
+  type: http
+  seq: 1
+}
+post {
+  url: http://localhost:8080/payroll.php?action=generate
+  body: formUrlEncoded
+  auth: none
+}
+body:form-urlencoded {
+  periode_bulan: 08
+  periode_tahun: 2026
+}
+tests {
+  test("Berhasil men-generate payroll (200/302)", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

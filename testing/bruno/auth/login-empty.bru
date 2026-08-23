@@ -1,0 +1,26 @@
+meta {
+  name: Login Empty Fields
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/login.php
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  username: 
+  password: 
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Menampilkan pesan error empty field", function() {
+    expect(res.getBody().includes('Username dan password wajib diisi')).to.be.true;
+  });
+}

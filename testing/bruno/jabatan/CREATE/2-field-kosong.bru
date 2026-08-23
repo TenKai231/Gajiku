@@ -1,0 +1,23 @@
+meta {
+  name: 2. Create Field Kosong
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_jabatan: 
+  gaji_pokok: 
+  tunjangan: 
+}
+
+tests {
+  test("Validasi menghentikan proses (Status 200, tidak redirect)", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

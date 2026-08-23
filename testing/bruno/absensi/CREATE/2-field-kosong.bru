@@ -1,0 +1,20 @@
+meta {
+  name: 2. Create Field Kosong
+  type: http
+  seq: 2
+}
+post {
+  url: http://localhost:8080/absensi.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+body:form-urlencoded {
+  karyawan_id: 
+  tanggal: 
+  status_absensi: 
+}
+tests {
+  test("Validasi menghentikan proses", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

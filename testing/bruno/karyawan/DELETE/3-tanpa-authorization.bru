@@ -1,0 +1,21 @@
+meta {
+  name: 3. Delete Tanpa Authorization
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=delete
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  id: 1
+}
+
+tests {
+  test("Dilarang melakukan aksi tanpa sesi / role admin", function() {
+    expect(res.getStatus()).to.be.oneOf([302, 403, 401]);
+  });
+}

@@ -1,0 +1,23 @@
+meta {
+  name: 4. Create Duplicate (Nama Jabatan)
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_jabatan: Manager IT
+  gaji_pokok: 12000000
+  tunjangan: 3000000
+}
+
+tests {
+  test("Validasi constraint duplicate/unik mencegah insert", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

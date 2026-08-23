@@ -1,0 +1,17 @@
+meta {
+  name: 1. Read List (Data Tersedia)
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8080/jabatan.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Berhasil melihat daftar jabatan (Status 200)", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

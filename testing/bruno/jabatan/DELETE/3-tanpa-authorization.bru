@@ -1,0 +1,23 @@
+meta {
+  name: 3. Delete Tanpa Authorization (Session Expired/Kosong)
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=delete
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  id: 1
+}
+
+tests {
+  test("Dilarang melakukan aksi tanpa sesi login", function() {
+    // Pada skenario ini, kita anggap Bruno berjalan TANPA PHPSESSID (sudah clear session).
+    // Karena ini sulit disimulasikan otomatis di Bruno saat "Run All", kita cek status redirect auth (302) atau 403
+    expect(res.getStatus()).to.be.oneOf([302, 403, 401]);
+  });
+}

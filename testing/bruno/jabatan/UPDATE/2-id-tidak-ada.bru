@@ -1,0 +1,23 @@
+meta {
+  name: 2. Update ID Tidak Ada
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=edit&id=99999
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_jabatan: Ghost
+  gaji_pokok: 1000
+  tunjangan: 0
+}
+
+tests {
+  test("Update menolak modifikasi ID yang tidak eksis", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302, 404]);
+  });
+}

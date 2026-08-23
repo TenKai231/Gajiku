@@ -1,0 +1,22 @@
+meta {
+  name: 1. Update Valid
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=edit&id=1
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_lengkap: Budi Santoso (Updated)
+  status: Nonaktif
+}
+
+tests {
+  test("Update berhasil dan redirect", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

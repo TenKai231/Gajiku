@@ -1,0 +1,26 @@
+meta {
+  name: 3. Create Format Salah (Email tidak valid)
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nip: EMP-002
+  nama_lengkap: Siti Aminah
+  email: bukan-format-email
+  jabatan_id: abc
+  tanggal_masuk: 2026-15-40
+  status: Aktif
+}
+
+tests {
+  test("Validasi format menolak email/tanggal/jabatan yang salah", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,26 @@
+meta {
+  name: 4. Create Duplicate (NIP Sama)
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nip: EMP-001
+  nama_lengkap: Budi Palsu
+  email: duplikat@gajiku.local
+  jabatan_id: 1
+  tanggal_masuk: 2026-01-10
+  status: Aktif
+}
+
+tests {
+  test("Validasi constraint duplicate NIP mencegah insert", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,19 @@
+meta {
+  name: 3. Generate Format Salah
+  type: http
+  seq: 3
+}
+post {
+  url: http://localhost:8080/payroll.php?action=generate
+  body: formUrlEncoded
+  auth: none
+}
+body:form-urlencoded {
+  periode_bulan: 15
+  periode_tahun: ABCD
+}
+tests {
+  test("Validasi menolak input invalid", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

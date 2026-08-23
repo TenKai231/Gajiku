@@ -1,0 +1,21 @@
+meta {
+  name: 1. Delete Valid
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=delete
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  id: 2
+}
+
+tests {
+  test("Delete berhasil", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

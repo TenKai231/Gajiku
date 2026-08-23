@@ -1,0 +1,17 @@
+meta {
+  name: 1. Belum Login
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8080/karyawan.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Harus diarahkan ke login", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

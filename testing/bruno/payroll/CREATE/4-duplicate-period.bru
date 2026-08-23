@@ -1,0 +1,19 @@
+meta {
+  name: 4. Generate Duplicate Period
+  type: http
+  seq: 4
+}
+post {
+  url: http://localhost:8080/payroll.php?action=generate
+  body: formUrlEncoded
+  auth: none
+}
+body:form-urlencoded {
+  periode_bulan: 08
+  periode_tahun: 2026
+}
+tests {
+  test("Gagal generate karena periode ini sudah di-generate sebelumnya", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

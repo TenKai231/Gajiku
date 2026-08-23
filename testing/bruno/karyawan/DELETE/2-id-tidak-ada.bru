@@ -1,0 +1,21 @@
+meta {
+  name: 2. Delete ID Tidak Ada
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=delete
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  id: 99999
+}
+
+tests {
+  test("Delete gagal gracefully", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302, 404]);
+  });
+}

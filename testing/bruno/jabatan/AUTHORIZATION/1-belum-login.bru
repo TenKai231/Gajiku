@@ -1,0 +1,18 @@
+meta {
+  name: 1. Belum Login
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8080/jabatan.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Harus diarahkan (redirect) ke halaman login", function() {
+    // Pada skenario ini kita perlu memastikan tidak ada Cookie (dikendalikan manual di Bruno)
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+}

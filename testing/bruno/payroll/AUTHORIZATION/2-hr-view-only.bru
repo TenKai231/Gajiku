@@ -1,0 +1,19 @@
+meta {
+  name: 2. HRD (Hanya Bisa View)
+  type: http
+  seq: 2
+}
+post {
+  url: http://localhost:8080/payroll.php?action=generate
+  body: formUrlEncoded
+  auth: none
+}
+body:form-urlencoded {
+  periode_bulan: 10
+  periode_tahun: 2026
+}
+tests {
+  test("HRD dilarang generate gaji (Forbidden)", function() {
+    expect(res.getStatus()).to.be.oneOf([302, 403, 401]);
+  });
+}

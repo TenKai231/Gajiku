@@ -1,0 +1,23 @@
+meta {
+  name: 3. Update Input Tidak Valid
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=edit&id=1
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_jabatan: 
+  gaji_pokok: -1
+  tunjangan: -1
+}
+
+tests {
+  test("Validasi update menangkap input kosong/minus", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

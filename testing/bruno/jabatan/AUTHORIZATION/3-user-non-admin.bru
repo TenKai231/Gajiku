@@ -1,0 +1,18 @@
+meta {
+  name: 3. Role User / HRD (Non-Admin)
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:8080/jabatan.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Akses ditolak (403 Forbidden) jika role bukan ADMIN", function() {
+    // Skenario: Anda harus login sebagai HRD sebelum menjalankan endpoint ini
+    expect(res.getStatus()).to.be.oneOf([403, 302]);
+  });
+}

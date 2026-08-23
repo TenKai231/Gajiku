@@ -1,0 +1,23 @@
+meta {
+  name: 3. Create Format Salah (Minus)
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/jabatan.php?action=create
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  nama_jabatan: Staff IT
+  gaji_pokok: -500000
+  tunjangan: -100000
+}
+
+tests {
+  test("Validasi angka menolak nilai minus", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

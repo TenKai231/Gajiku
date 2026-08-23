@@ -1,0 +1,21 @@
+meta {
+  name: 3. Update Input Tidak Valid
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/karyawan.php?action=edit&id=1
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  email: bukan_email
+}
+
+tests {
+  test("Validasi update menangkap format salah", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

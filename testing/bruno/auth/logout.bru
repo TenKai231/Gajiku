@@ -1,0 +1,23 @@
+meta {
+  name: Logout
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8080/logout.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Redirect ke login page dengan parameter logout=1", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 302]);
+  });
+  
+  test("Terdapat pesan sukses logout jika follow redirect", function() {
+    if (res.getStatus() === 200) {
+      expect(res.getBody().includes('Sesi berhasil diakhiri')).to.be.true;
+    }
+  });
+}

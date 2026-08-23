@@ -1,0 +1,17 @@
+meta {
+  name: 2. Role Admin
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/karyawan.php
+  body: none
+  auth: none
+}
+
+tests {
+  test("Akses diterima", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
