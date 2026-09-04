@@ -52,6 +52,7 @@ function validateKaryawanInput(array $input): array
         'tanggal_lahir' => trim((string) ($input['tanggal_lahir'] ?? '')),
         'tanggal_masuk' => trim((string) ($input['tanggal_masuk'] ?? '')),
         'jabatan_id' => trim((string) ($input['jabatan_id'] ?? '')),
+        'golongan_id' => trim((string) ($input['golongan_id'] ?? '')),
         'status' => trim((string) ($input['status'] ?? '')),
     ];
 
@@ -102,6 +103,12 @@ function validateKaryawanInput(array $input): array
         $errors['jabatan_id'] = 'Jabatan wajib dipilih.';
     }
 
+    // Golongan
+    $golonganId = (int) $form['golongan_id'];
+    if ($golonganId <= 0) {
+        $errors['golongan_id'] = 'Golongan wajib dipilih.';
+    }
+
     // Status
     if (!in_array($form['status'], ['Aktif', 'Nonaktif'], true)) {
         $errors['status'] = 'Status tidak valid.';
@@ -117,6 +124,7 @@ function validateKaryawanInput(array $input): array
             'tanggal_lahir' => $form['tanggal_lahir'],
             'tanggal_masuk' => $form['tanggal_masuk'],
             'jabatan_id' => $jabatanId,
+            'golongan_id' => $golonganId,
             'status' => $form['status'],
         ],
     ];
@@ -125,8 +133,8 @@ function validateKaryawanInput(array $input): array
 function createKaryawan(PDO $pdo, array $data): void
 {
     $stmt = $pdo->prepare(
-        'INSERT INTO karyawan (nip, nama, jenis_kelamin, tanggal_lahir, tanggal_masuk, jabatan_id, status)
-         VALUES (:nip, :nama, :jenis_kelamin, :tanggal_lahir, :tanggal_masuk, :jabatan_id, :status)'
+        'INSERT INTO karyawan (nip, nama, jenis_kelamin, tanggal_lahir, tanggal_masuk, jabatan_id, golongan_id, status)
+         VALUES (:nip, :nama, :jenis_kelamin, :tanggal_lahir, :tanggal_masuk, :jabatan_id, :golongan_id, :status)'
     );
     $stmt->execute([
         ':nip' => $data['nip'],
@@ -135,6 +143,7 @@ function createKaryawan(PDO $pdo, array $data): void
         ':tanggal_lahir' => $data['tanggal_lahir'],
         ':tanggal_masuk' => $data['tanggal_masuk'],
         ':jabatan_id' => $data['jabatan_id'],
+        ':golongan_id' => $data['golongan_id'],
         ':status' => $data['status'],
     ]);
 }
@@ -149,6 +158,7 @@ function updateKaryawan(PDO $pdo, int $id, array $data): void
              tanggal_lahir = :tanggal_lahir,
              tanggal_masuk = :tanggal_masuk,
              jabatan_id = :jabatan_id,
+             golongan_id = :golongan_id,
              status = :status
          WHERE id = :id'
     );
@@ -159,6 +169,7 @@ function updateKaryawan(PDO $pdo, int $id, array $data): void
         ':tanggal_lahir' => $data['tanggal_lahir'],
         ':tanggal_masuk' => $data['tanggal_masuk'],
         ':jabatan_id' => $data['jabatan_id'],
+        ':golongan_id' => $data['golongan_id'],
         ':status' => $data['status'],
         ':id' => $id,
     ]);

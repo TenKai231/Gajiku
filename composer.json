@@ -1,0 +1,8 @@
+{
+    "name": "tenkai/gajiku",
+    "description": "Sistem Informasi Penggajian Karyawan Sederhana",
+    "type": "project",
+    "require": {
+        "phpoffice/phpspreadsheet": "^3.0"
+    }
+}

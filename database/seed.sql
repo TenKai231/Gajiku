@@ -14,11 +14,17 @@ VALUES
     ('Staff HR', 7000000.00, 1000000.00),
     ('Staff Administrasi', 5500000.00, 750000.00);
 
-INSERT INTO karyawan (nip, nama, jenis_kelamin, tanggal_lahir, tanggal_masuk, jabatan_id, status)
+INSERT INTO golongan (nama_golongan, uang_makan)
 VALUES
-    ('KRY001', 'Budi Santoso', 'L', '1995-03-12', '2022-01-10', 1, 'Aktif'),
-    ('KRY002', 'Siti Rahma', 'P', '1998-07-23', '2023-04-01', 2, 'Aktif'),
-    ('KRY003', 'Andi Pratama', 'L', '1997-11-05', '2021-09-15', 3, 'Aktif');
+    ('Golongan I', 50000.00),
+    ('Golongan II', 75000.00),
+    ('Golongan III', 100000.00);
+
+INSERT INTO karyawan (nip, nama, jenis_kelamin, tanggal_lahir, tanggal_masuk, jabatan_id, golongan_id, status)
+VALUES
+    ('KRY001', 'Budi Santoso', 'L', '1995-03-12', '2022-01-10', 1, 3, 'Aktif'),
+    ('KRY002', 'Siti Rahma', 'P', '1998-07-23', '2023-04-01', 2, 2, 'Aktif'),
+    ('KRY003', 'Andi Pratama', 'L', '1997-11-05', '2021-09-15', 3, 1, 'Aktif');
 
 INSERT INTO absensi (karyawan_id, tanggal, status, jam_masuk, jam_pulang, keterangan)
 VALUES
@@ -31,6 +37,7 @@ INSERT INTO penggajian (
     periode,
     gaji_pokok,
     total_tunjangan,
+    uang_makan,
     total_potongan,
     gaji_kotor,
     gaji_bersih,
@@ -38,5 +45,5 @@ INSERT INTO penggajian (
     status
 )
 VALUES
-    (1, '2026-08', 12000000.00, 2000000.00, 50000.00, 14000000.00, 13950000.00, '2026-08-21', 'Processed'),
-    (2, '2026-08', 7000000.00, 1000000.00, 250000.00, 8000000.00, 7750000.00, '2026-08-21', 'Processed');
+    (1, '2026-08', 12000000.00, 2000000.00, 100000.00, 100000.00, 14100000.00, 14000000.00, '2026-08-21', 'Processed'),
+    (2, '2026-08', 7000000.00, 1000000.00, 75000.00, 250000.00, 8075000.00, 7825000.00, '2026-08-21', 'Processed');

@@ -12,11 +12,12 @@ if ($user['role'] !== 'ADMIN') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 
 $input = [
     'nama_jabatan' => $_POST['nama_jabatan'] ?? '',
@@ -39,18 +40,18 @@ if (empty($errors['nama_jabatan'])) {
 if (count($errors) > 0) {
     $_SESSION['errors'] = $errors;
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/jabatan/create.php');
+    header('Location: /?page=jabatan/create');
     exit;
 }
 
 try {
     createJabatan($pdo, $data);
     $_SESSION['success'] = 'Jabatan baru berhasil ditambahkan.';
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
 } catch (Exception $e) {
     error_log($e->getMessage());
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat menyimpan jabatan.';
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/jabatan/create.php');
+    header('Location: /?page=jabatan/create');
 }
 exit;

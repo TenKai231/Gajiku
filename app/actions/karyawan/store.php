@@ -12,11 +12,13 @@ if ($user['role'] !== 'ADMIN') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/karyawan/index.php');
+    header('Location: /?page=karyawan/index');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
+$pdo = getPDO();
 
 $input = [
     'nip' => $_POST['nip'] ?? '',
@@ -25,6 +27,7 @@ $input = [
     'tanggal_lahir' => $_POST['tanggal_lahir'] ?? '',
     'tanggal_masuk' => $_POST['tanggal_masuk'] ?? '',
     'jabatan_id' => $_POST['jabatan_id'] ?? '',
+    'golongan_id' => $_POST['golongan_id'] ?? '',
     'status' => $_POST['status'] ?? '',
 ];
 
@@ -43,18 +46,18 @@ if (empty($errors['nip'])) {
 if (count($errors) > 0) {
     $_SESSION['errors'] = $errors;
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/karyawan/create.php');
+    header('Location: /?page=karyawan/create');
     exit;
 }
 
 try {
     createKaryawan($pdo, $data);
     $_SESSION['success'] = 'Data Karyawan berhasil ditambahkan.';
-    header('Location: /app/pages/karyawan/index.php');
+    header('Location: /?page=karyawan/index');
 } catch (Exception $e) {
     error_log($e->getMessage());
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat menyimpan data.';
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/karyawan/create.php');
+    header('Location: /?page=karyawan/create');
 }
 exit;

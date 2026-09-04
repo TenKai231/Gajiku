@@ -12,18 +12,19 @@ if ($user['role'] !== 'ADMIN') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
     $_SESSION['error'] = 'ID Jabatan tidak valid.';
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 
 // Cek jika masih ada relasi dengan karyawan sebelum hapus
 try {
@@ -34,7 +35,7 @@ try {
 
     if ($karyawanCount > 0) {
         $_SESSION['error'] = "Gagal menghapus! Jabatan ini sedang digunakan oleh {$karyawanCount} karyawan.";
-        header('Location: /app/pages/jabatan/index.php');
+        header('Location: /?page=jabatan');
         exit;
     }
 
@@ -53,5 +54,5 @@ try {
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat menghapus jabatan.';
 }
 
-header('Location: /app/pages/jabatan/index.php');
+header('Location: /?page=jabatan');
 exit;

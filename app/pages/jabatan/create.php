@@ -35,12 +35,12 @@ unset($_SESSION['errors'], $_SESSION['form']);
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h3 mb-0">Tambah Jabatan</h1>
-                    <a href="index.php" class="btn btn-outline-secondary">Kembali</a>
+                    <a href="/?page=jabatan" class="btn btn-outline-secondary">Kembali</a>
                 </div>
 
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <form action="/app/actions/jabatan/store.php" method="POST">
+                        <form action="/?action=jabatan/store" method="POST">
                             <div class="mb-3">
                                 <label for="nama_jabatan" class="form-label">Nama Jabatan</label>
                                 <input type="text"

@@ -9,11 +9,12 @@ $user = currentUser();
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
-    header('Location: /app/pages/payroll/index.php');
+    header('Location: /?page=payroll/index');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 
 $stmt = $pdo->prepare(
     'SELECT p.*, k.nama, k.nip, j.nama_jabatan
@@ -40,40 +41,42 @@ $namaBulan = $bulanArr[(int)$b] ?? $b;
 $strPeriode = $namaBulan . ' ' . $t;
 
 ?>
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Slip Gaji - <?= htmlspecialchars((string)$slip['nama'], ENT_QUOTES, 'UTF-8') ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .slip-gaji {
-            max-width: 600px;
-            margin: 40px auto;
-            border: 1px dashed #ccc;
-            padding: 30px;
-            background: #fff;
-        }
-        @media print {
-            body { background: #fff; }
-            .no-print { display: none !important; }
-            .slip-gaji { border: none; margin: 0; padding: 0; box-shadow: none; }
-        }
-    </style>
-</head>
-<body class="bg-light">
+<style>
+    .slip-gaji {
+        max-width: 600px;
+        margin: 40px auto;
+        border: 1px dashed #ccc;
+        padding: 30px;
+        background: #fff;
+    }
+    @media print {
+        .no-print { display: none !important; }
+        .slip-gaji { border: none; margin: 0; padding: 0; box-shadow: none; max-width: none; }
+    }
+</style>
 
-    <div class="container">
-        <div class="mb-4 mt-4 no-print text-center">
-            <a href="index.php" class="btn btn-outline-secondary me-2">Kembali</a>
+<div class="row justify-content-center">
+    <div class="col-12">
+        <?php if ($slip['status'] === 'Draft'): ?>
+            <div class="alert alert-warning no-print" role="alert">
+                <strong>Payroll masih Draft.</strong> Nominal dapat berubah saat payroll dihitung ulang.
+            </div>
+        <?php endif; ?>
+        <?php if ($slip['status'] === 'Corrected'): ?>
+            <div class="alert alert-secondary no-print" role="alert">
+                <strong>Dokumen histori.</strong> Payroll ini sudah dikoreksi oleh revisi berikutnya dan tidak dapat diubah.
+            </div>
+        <?php endif; ?>
+        <div class="mb-4 no-print text-center">
+            <a href="/?page=payroll/index" class="btn btn-outline-secondary me-2">Kembali</a>
             <button onclick="window.print()" class="btn btn-primary">Cetak / Export PDF</button>
         </div>
 
         <div class="slip-gaji shadow-sm">
             <div class="text-center mb-4 border-bottom pb-3">
                 <h2 class="mb-1 fw-bold">SLIP GAJI</h2>
-                <h5 class="text-muted mb-0">PT GAJIKU MAJU SEJAHTERA</h5>
+                <h5 class="text-muted mb-0">Kantor Jaya Bersama</h5>
+                <span class="badge <?= $slip['status'] === 'Draft' ? 'bg-warning text-dark' : ($slip['status'] === 'Paid' ? 'bg-success' : ($slip['status'] === 'Corrected' ? 'bg-secondary' : 'bg-info text-dark')) ?> mt-2"><?= htmlspecialchars($slip['status'], ENT_QUOTES, 'UTF-8') ?> · Revisi <?= (int) $slip['revisi'] ?></span>
             </div>
 
             <div class="row mb-4">
@@ -92,18 +95,39 @@ $strPeriode = $namaBulan . ' ' . $t;
                 <span>Gaji Pokok</span>
                 <span><?= formatCurrency((float)$slip['gaji_pokok']) ?></span>
             </div>
-            <div class="d-flex justify-content-between mb-3 px-2">
+            <div class="d-flex justify-content-between mb-2 px-2">
                 <span>Tunjangan</span>
                 <span><?= formatCurrency((float)$slip['total_tunjangan']) ?></span>
             </div>
+            <div class="d-flex justify-content-between mb-3 px-2">
+                <span>Uang Makan</span>
+                <span><?= formatCurrency((float)$slip['total_uang_makan']) ?></span>
+            </div>
             <div class="d-flex justify-content-between mb-4 px-2 fw-bold">
-                <span>Total Gaji Kotor</span>
+                <span>Total Penghasilan Bruto (Gaji Kotor)</span>
                 <span><?= formatCurrency((float)$slip['gaji_kotor']) ?></span>
             </div>
 
             <h6 class="fw-bold bg-light p-2 border">POTONGAN</h6>
+            <div class="d-flex justify-content-between mb-2 px-2">
+                <span>Potongan Absensi (Alpha/Sakit)</span>
+                <span class="text-danger">- <?= formatCurrency((float)$slip['potongan_lain']) ?></span>
+            </div>
+            <div class="d-flex justify-content-between mb-2 px-2">
+                <span>Potongan Keterlambatan (Uang Makan)</span>
+                <span class="text-danger">- <?= formatCurrency((float)$slip['potongan_uang_makan']) ?></span>
+            </div>
             <div class="d-flex justify-content-between mb-3 px-2">
-                <span>Total Potongan (Absensi & Keterlambatan)</span>
+                <span>PPh Pasal 21</span>
+                <span class="text-danger">- <?= formatCurrency((float)$slip['pph21']) ?></span>
+            </div>
+            
+            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                <span>Potongan BPJS Karyawan</span>
+                <span class="text-danger">- <?= formatCurrency((float)($slip['potongan_bpjs'] ?? 0)) ?></span>
+            </div>
+            <div class="d-flex justify-content-between mb-4 px-2 fw-bold">
+                <span>Total Potongan</span>
                 <span class="text-danger">- <?= formatCurrency((float)$slip['total_potongan']) ?></span>
             </div>
 
@@ -111,6 +135,16 @@ $strPeriode = $namaBulan . ' ' . $t;
                 <span>GAJI BERSIH (TAKE HOME PAY)</span>
                 <span class="text-success"><?= formatCurrency((float)$slip['gaji_bersih']) ?></span>
             </div>
+
+            <?php if ($user['role'] === 'ADMIN' || $user['role'] === 'HR'): ?>
+            <div class="mt-4 border-top pt-3 text-muted" style="font-size: 0.85rem;">
+                <p class="fw-bold mb-1">Informasi Pajak (Hanya tampil untuk HR/Admin):</p>
+                <ul class="mb-0 ps-3">
+                    <li>Status PTKP Snapshot: <strong><?= htmlspecialchars($slip['status_ptkp_snapshot'] ?? '-', ENT_QUOTES) ?></strong></li>
+                    <li>Kategori TER Snapshot: <strong><?= htmlspecialchars($slip['kategori_ter_snapshot'] ?? '-', ENT_QUOTES) ?></strong></li>
+                </ul>
+            </div>
+            <?php endif; ?>
 
             <div class="row mt-5 pt-4 text-center">
                 <div class="col-6">
@@ -124,6 +158,4 @@ $strPeriode = $namaBulan . ' ' . $t;
             </div>
         </div>
     </div>
-
-</body>
-</html>
+</div>

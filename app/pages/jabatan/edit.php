@@ -13,16 +13,17 @@ if ($user['role'] !== 'ADMIN') {
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 $jabatan = fetchJabatanById($pdo, $id);
 
 if (!$jabatan) {
     $_SESSION['error'] = 'Jabatan tidak ditemukan.';
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
@@ -56,12 +57,12 @@ unset($_SESSION['errors'], $_SESSION['form']);
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h3 mb-0">Edit Jabatan</h1>
-                    <a href="index.php" class="btn btn-outline-secondary">Kembali</a>
+                    <a href="/?page=jabatan" class="btn btn-outline-secondary">Kembali</a>
                 </div>
 
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <form action="/app/actions/jabatan/update.php" method="POST">
+                        <form action="/?action=jabatan/update" method="POST">
                             <input type="hidden" name="id" value="<?= htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8') ?>">
 
                             <div class="mb-3">

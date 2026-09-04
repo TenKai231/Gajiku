@@ -6,28 +6,29 @@ require_once dirname(__DIR__, 2) . '/includes/absensi.php';
 
 requireAuth();
 $user = currentUser();
-if ($user['role'] !== 'ADMIN') {
+if (!in_array($user['role'], ['ADMIN', 'FINANCE'], true)) {
     http_response_code(403);
     die('Akses ditolak.');
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/absensi/index.php');
+    header('Location: /?page=absensi/index');
     exit;
 }
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
     $_SESSION['error'] = 'ID Absensi tidak valid.';
-    header('Location: /app/pages/absensi/index.php');
+    header('Location: /?page=absensi/index');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 $absensi = fetchAbsensiById($pdo, $id);
 if (!$absensi) {
     $_SESSION['error'] = 'Data absensi tidak ditemukan.';
-    header('Location: /app/pages/absensi/index.php');
+    header('Location: /?page=absensi/index');
     exit;
 }
 
@@ -55,18 +56,18 @@ if (empty($errors['karyawan_id']) && empty($errors['tanggal'])) {
 if (count($errors) > 0) {
     $_SESSION['errors'] = $errors;
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/absensi/edit.php?id=' . $id);
+    header('Location: /?page=absensi/edit&id=' . $id);
     exit;
 }
 
 try {
     updateAbsensi($pdo, $id, $data);
     $_SESSION['success'] = 'Data Absensi berhasil diupdate.';
-    header('Location: /app/pages/absensi/index.php');
+    header('Location: /?page=absensi/index');
 } catch (Exception $e) {
     error_log($e->getMessage());
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat mengupdate absensi.';
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/absensi/edit.php?id=' . $id);
+    header('Location: /?page=absensi/edit&id=' . $id);
 }
 exit;

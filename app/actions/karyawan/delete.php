@@ -12,18 +12,20 @@ if ($user['role'] !== 'ADMIN') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/karyawan/index.php');
+    header('Location: /?page=karyawan/index');
     exit;
 }
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
     $_SESSION['error'] = 'ID Karyawan tidak valid.';
-    header('Location: /app/pages/karyawan/index.php');
+    header('Location: /?page=karyawan/index');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
+$pdo = getPDO();
 
 try {
     // Di sini seharusnya idealnya mengecek apakah karyawan punya absensi/penggajian (karena FK).
@@ -42,5 +44,5 @@ try {
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat menghapus karyawan.';
 }
 
-header('Location: /app/pages/karyawan/index.php');
+header('Location: /?page=karyawan/index');
 exit;

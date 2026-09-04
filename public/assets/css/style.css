@@ -1,0 +1,233 @@
+/* Gajiku Base Styles */
+
+:root {
+  --primary-color: #1E3A5F;
+  --secondary-color: #6B7280;
+  --tertiary-color: #2563EB;
+  --bg-color: #F8FAFC;
+  --surface-color: #FFFFFF;
+  --border-color: #E2E8F0;
+  --input-border: #CBD5E1;
+  --success-color: #16A34A;
+  --warning-color: #CA8A04;
+  --error-color: #DC2626;
+  --info-color: #2563EB;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif', 'Nunito', serif;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 32px; }
+h2 { font-size: 24px; }
+h3 { font-size: 20px; }
+h4 { font-size: 18px; }
+
+code, .tech-number {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Cards */
+.card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: none !important;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #152a45;
+  border-color: #152a45;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.btn-danger {
+  background-color: var(--error-color);
+  border-color: var(--error-color);
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Tables */
+.table {
+  border-radius: 0;
+}
+
+.table th {
+  padding: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table td {
+  padding: 8px;
+  vertical-align: middle;
+  height: 40px;
+}
+
+.table-light {
+  background-color: #f1f5f9;
+}
+
+/* Forms */
+.form-control, .form-select {
+  border-radius: 4px;
+  border-color: var(--input-border);
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+/* Navbar overrides */
+.navbar-dark.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+}
+
+.navbar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* Badges */
+.badge {
+  border-radius: 2px;
+  font-weight: 500;
+  padding: 4px 8px;
+}
+
+.bg-success { background-color: var(--success-color) !important; }
+.bg-warning { background-color: var(--warning-color) !important; }
+.bg-danger { background-color: var(--error-color) !important; }
+.bg-info { background-color: var(--info-color) !important; }
+.bg-primary { background-color: var(--primary-color) !important; }
+.bg-secondary { background-color: var(--secondary-color) !important; }
+
+/* Breadcrumb */
+.breadcrumb {
+  margin-bottom: 12px;
+}
+
+.breadcrumb-item a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-secondary);
+}
+
+/* Sidebar structure */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--primary-color);
+  color: white;
+  flex-shrink: 0;
+  transition: margin-left 0.25s ease;
+}
+
+/* State: sidebar disembunyikan (di-toggle dari tombol hamburger topbar) */
+.sidebar-collapsed .sidebar {
+  margin-left: -250px;
+}
+
+.sidebar a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  padding: 12px 20px;
+  display: block;
+}
+
+.sidebar a:hover, .sidebar a.active {
+  color: white;
+  background-color: rgba(255,255,255,0.1);
+}
+
+.main-content {
+  flex-grow: 1;
+  background-color: var(--bg-color);
+}
+
+/* ====== Print / Export PDF ====== */
+@media print {
+  /* Sembunyikan elemen navigasi agar tidak ikut ter-print */
+  .sidebar,
+  .main-content > header,
+  .app-wrapper > .sidebar,
+  nav[aria-label="breadcrumb"],
+  .no-print {
+    display: none !important;
+  }
+
+  /* Rapikan wrapper saat print agar konten jadi lebar penuh */
+  .app-wrapper,
+  .main-content {
+    display: block !important;
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
+  body { background: #fff !important; }
+
+  main.container-fluid {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}

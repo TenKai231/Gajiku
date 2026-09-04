@@ -12,24 +12,25 @@ if ($user['role'] !== 'ADMIN') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
     $_SESSION['error'] = 'ID Jabatan tidak valid.';
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 
 // Pastikan jabatan ada
 $jabatan = fetchJabatanById($pdo, $id);
 if (!$jabatan) {
     $_SESSION['error'] = 'Jabatan tidak ditemukan.';
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
     exit;
 }
 
@@ -54,18 +55,18 @@ if (empty($errors['nama_jabatan'])) {
 if (count($errors) > 0) {
     $_SESSION['errors'] = $errors;
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/jabatan/edit.php?id=' . $id);
+    header('Location: /?page=jabatan/edit&id=' . $id);
     exit;
 }
 
 try {
     updateJabatan($pdo, $id, $data);
     $_SESSION['success'] = 'Jabatan berhasil diupdate.';
-    header('Location: /app/pages/jabatan/index.php');
+    header('Location: /?page=jabatan');
 } catch (Exception $e) {
     error_log($e->getMessage());
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat mengupdate jabatan.';
     $_SESSION['form'] = $form;
-    header('Location: /app/pages/jabatan/edit.php?id=' . $id);
+    header('Location: /?page=jabatan/edit&id=' . $id);
 }
 exit;

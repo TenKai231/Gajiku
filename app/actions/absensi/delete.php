@@ -6,24 +6,25 @@ require_once dirname(__DIR__, 2) . '/includes/absensi.php';
 
 requireAuth();
 $user = currentUser();
-if ($user['role'] !== 'ADMIN') {
+if (!in_array($user['role'], ['ADMIN', 'FINANCE'], true)) {
     http_response_code(403);
     die('Akses ditolak.');
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /app/pages/absensi/index.php');
+    header('Location: /?page=absensi/index');
     exit;
 }
 
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
     $_SESSION['error'] = 'ID Absensi tidak valid.';
-    header('Location: /app/pages/absensi/index.php');
+    header('Location: /?page=absensi/index');
     exit;
 }
 
-$pdo = require dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+$pdo = getPDO();
 
 try {
     deleteAbsensi($pdo, $id);
@@ -33,5 +34,5 @@ try {
     $_SESSION['error'] = 'Terjadi kesalahan sistem saat menghapus absensi.';
 }
 
-header('Location: /app/pages/absensi/index.php');
+header('Location: /?page=absensi/index');
 exit;

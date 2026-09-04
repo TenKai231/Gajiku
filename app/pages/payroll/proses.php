@@ -16,71 +16,72 @@ $bulanList = [
     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 
-$bulanSekarang = (int) date('m');
-$tahunSekarang = (int) date('Y');
+$bulanSaatIni = filter_input(INPUT_GET, 'bulan', FILTER_VALIDATE_INT) ?: (int) date('m');
+$tahunSaatIni = filter_input(INPUT_GET, 'tahun', FILTER_VALIDATE_INT) ?: (int) date('Y');
+$modeKoreksi = ($_GET['mode'] ?? '') === 'koreksi';
 
-$error = $_SESSION['error'] ?? '';
+$error = $_SESSION['error'] ?? null;
 unset($_SESSION['error']);
 ?>
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Proses Penggajian — Sistem Informasi Penggajian</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/index.php">Gajiku</a>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Proses Payroll</h1>
+            <a href="/?page=payroll/index" class="btn btn-outline-secondary">Kembali</a>
         </div>
-    </nav>
 
-    <main class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white pt-4 pb-3 border-0">
-                        <h1 class="h4 mb-0 text-center">Jalankan Payroll Engine</h1>
+        <?php if ($error): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <div class="alert alert-info">
+            <h5 class="alert-heading"><i class="bi bi-info-circle-fill me-2"></i>Informasi Proses</h5>
+            <p class="mb-0">Payroll Engine akan menghitung gaji secara otomatis untuk seluruh karyawan aktif berdasarkan data absensi, uang makan, tunjangan, dan PPh 21 pada periode yang dipilih.</p>
+        </div>
+
+        <?php if ($modeKoreksi): ?>
+            <div class="alert alert-warning">
+                <strong>Mode Koreksi Payroll.</strong> Payroll <em>Paid</em> lama akan dipertahankan sebagai histori berstatus <em>Corrected</em>; sistem membuat revisi baru untuk periode ini.
+            </div>
+        <?php endif; ?>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form action="/?action=payroll/process" method="POST" onsubmit="return confirm('Payroll akan dihitung berdasarkan data terbaru. Draft dapat dihitung ulang, sedangkan payroll Processed tidak dapat diubah. Lanjutkan?');">
+                    <?php if ($modeKoreksi): ?>
+                        <input type="hidden" name="mode_koreksi" value="1">
+                    <?php endif; ?>
+                    <div class="mb-3">
+                        <label for="bulan" class="form-label">Periode Bulan <span class="text-danger">*</span></label>
+                        <select class="form-select" id="bulan" name="bulan" required>
+                            <option value="">-- Pilih Bulan --</option>
+                            <?php foreach ($bulanList as $num => $name): ?>
+                                <option value="<?= $num ?>" <?= $bulanSaatIni === $num ? 'selected' : '' ?>><?= $name ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                    <div class="card-body p-4">
 
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger" role="alert">
-                                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <p class="text-muted text-center mb-4">
-                            Sistem akan mengambil data karyawan yang aktif, menghitung absensi, tunjangan, dan potongan untuk menentukan gaji bersih otomatis.
-                        </p>
-
-                        <form action="/app/actions/payroll/process.php" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memproses payroll periode ini? Proses ini tidak dapat dibatalkan.');">
-                            <div class="row mb-4">
-                                <div class="col-md-7">
-                                    <label for="bulan" class="form-label">Periode Bulan</label>
-                                    <select class="form-select" id="bulan" name="bulan" required>
-                                        <?php foreach ($bulanList as $num => $name): ?>
-                                            <option value="<?= $num ?>" <?= $bulanSekarang === $num ? 'selected' : '' ?>><?= $name ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-5">
-                                    <label for="tahun" class="form-label">Tahun</label>
-                                    <input type="number" class="form-control" id="tahun" name="tahun" value="<?= $tahunSekarang ?>" min="2020" max="2099" required>
-                                </div>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">Proses Kalkulasi Gaji</button>
-                                <a href="index.php" class="btn btn-outline-secondary">Batal</a>
-                            </div>
-                        </form>
+                    <div class="mb-4">
+                        <label for="tahun" class="form-label">Tahun <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="tahun" name="tahun" value="<?= $tahunSaatIni ?>" required min="2020" max="2099">
                     </div>
-                </div>
+
+                    <div class="form-check form-switch border rounded p-3 mb-4">
+                        <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="simpan_sebagai_draft" name="simpan_sebagai_draft" value="1" checked>
+                        <label class="form-check-label fw-semibold" for="simpan_sebagai_draft">Simpan sebagai Draft</label>
+                        <div class="form-text ms-0">Draft dapat diubah dengan memperbarui data absensi atau master data, lalu menjalankan ulang payroll untuk periode ini. Matikan toggle untuk mengunci hasil sebagai <em>Processed</em>.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-gear-wide-connected me-2"></i> Proses Payroll
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-    </main>
-</body>
-</html>
+    </div>
+</div>
