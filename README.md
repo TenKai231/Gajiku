@@ -1,79 +1,61 @@
-# Sistem Informasi Penggajian Otomatis (Gajiku)
+# Gajiku — Sistem Informasi Penggajian Otomatis
 
-Aplikasi web penggajian sederhana berbasis PHP Native untuk perusahaan kecil/menengah. Dirancang sebagai proyek perkuliahan, fondasi proyek ini menyiapkan struktur kode, database, pengujian (*testing*), dan lingkungan pengembangan agar fitur-fitur dapat dikembangkan secara bertahap dan aman.
+Gajiku adalah aplikasi web penggajian berbasis **PHP Native** untuk kebutuhan internal perusahaan kecil/menengah.
+Dokumen ini dirapikan agar alur instalasi, struktur folder, dan cara kerja web lebih mudah dipahami.
 
-## Technology Stack
+## Ringkasan Teknologi
 
 - **Backend:** PHP Native (tanpa framework)
-- **Database:** MySQL/MariaDB (Akses menggunakan PDO + Prepared Statements)
+- **Database:** MariaDB/MySQL via PDO + Prepared Statements
 - **Frontend:** HTML, Bootstrap 5, Vanilla JavaScript
-- **Testing:** Bruno (API & HTTP Flow Testing)
-- **Environment:** Docker (opsional/rekomendasi) atau XAMPP (untuk tim non-Docker)
+- **Testing:** Bruno collection (HTTP/API flow)
+- **Environment:** Docker (rekomendasi) atau XAMPP
 
-## Struktur Proyek
+## Struktur Folder (Aktual)
 
 ```text
-sistem-informasi-penggajian/
-│
+Gajiku/
 ├── app/
-│   ├── actions/          # (Opsional) Penampung logika pemrosesan form
-│   ├── config/           # Konfigurasi database & rules payroll
-│   ├── includes/         # Modul auth, session, helper
-│   ├── pages/            # Halaman UI internal (dashboard, CRUD entitas)
-│   └── assets/           # CSS, JS, dan img tĩnh
-│
+│   ├── actions/      # Handler proses (create/update/delete, logout, dll)
+│   ├── config/       # Konfigurasi database dan helper konfigurasi
+│   ├── includes/     # Auth, layout, helper session/flash
+│   └── pages/        # Halaman UI per modul
 ├── database/
 │   ├── schema.sql
 │   ├── seed.sql
-│   └── demo_users.sql    # Kredensial akun untuk demo (Admin & HR)
-│
-├── public/               # ENTRY POINTS / Document Root (Apache)
-│   ├── index.php         # Entry point Dashboard
-│   ├── login.php         # Halaman autentikasi
-│   ├── logout.php        # Aksi logout
-│   ├── jabatan.php       # Entry point fitur Jabatan
-│   ├── karyawan.php      # Entry point fitur Karyawan
-│   ├── absensi.php       # Entry point fitur Absensi
-│   └── payroll.php       # Entry point fitur Penggajian
-│
+│   └── demo_users.sql
+├── public/
+│   ├── index.php     # Front controller utama setelah login
+│   ├── login.php     # Halaman login
+│   ├── test-connection.php
+│   └── assets/
 ├── testing/
-│   └── bruno/            # Kumpulan koleksi Bruno test (Auth, CRUD, Dll)
-│
+│   └── bruno/
 ├── docker/
 ├── compose.yaml
 ├── .env.example
-├── .gitignore
-└── README.md
+└── bpjs_service.php
 ```
 
-## Update Terbaru (Agustus 2026)
-*   **Keamanan & Entry Point**: Memisahkan direktori web ter-ekspos (`public/`) dengan direktori *backend logic* (`app/`). Web server dikonfigurasi untuk hanya merender apa yang ada di folder `public/`.
-*   **Autentikasi Aktif**: Implementasi `requireAuth()` dan `requireRole()` yang solid menggunakan *PHP Session* dan PDO Prepared Statement di `app/includes/auth.php`.
-*   **Test Matrix Komprehensif (Bruno)**: Menambahkan koleksi pengujian Bruno untuk *Authentication*, serta *Test Matrix* kompleks (CREATE, READ, UPDATE, DELETE, AUTHORIZATION) untuk entitas Jabatan, Karyawan, Absensi, dan Payroll.
+## Cara Kerja Web App (Flow)
 
----
-
-## Requirements
-
-### Developer Docker (Arch Linux / OS Lain)
-
-- Docker
-- Docker Compose
-- Git
-- (Opsional) Bruno / Bruno CLI untuk menjalankan Automated Test
-
-### Developer XAMPP (Windows)
-
-- XAMPP (Apache + MySQL/MariaDB)
-- Git
+1. User membuka `public/login.php`.
+2. `login.php` memvalidasi kredensial ke tabel `users` memakai PDO prepared statement.
+3. Jika valid, data user disimpan ke `$_SESSION` melalui `loginUser()` di `app/includes/auth.php`, lalu redirect ke `public/index.php`.
+4. `public/index.php` menjalankan `requireAuth()` untuk memastikan hanya user login yang bisa mengakses halaman internal.
+5. Routing di `index.php`:
+   - `?action=...` → memanggil file di `app/actions/...` untuk proses backend.
+   - `?page=...` → merender file di `app/pages/...` untuk tampilan.
+6. Jika `page` mengandung `print`/`cetak`, halaman dirender tanpa layout utama (mode cetak).
+7. Jika user logout, action `app/actions/auth/logout.php` akan menghapus session dan redirect ke `login.php?logout=1`.
 
 ## Menjalankan dengan Docker (Rekomendasi)
 
-1. Salin file environment:
+1. Salin environment file:
    ```bash
    cp .env.example .env
    ```
-2. Sesuaikan `.env` (Jika memakai default docker-compose):
+2. Gunakan nilai default berikut (jika belum diubah):
    ```env
    DB_HOST=db
    DB_PORT=3306
@@ -82,7 +64,7 @@ sistem-informasi-penggajian/
    DB_PASSWORD=root
    DB_ROOT_PASSWORD=root
    ```
-3. Jalankan container:
+3. Jalankan service:
    ```bash
    docker compose up -d
    ```
@@ -92,21 +74,29 @@ sistem-informasi-penggajian/
    docker compose exec -T db mariadb -uroot -proot < database/seed.sql
    docker compose exec -T db mariadb -uroot -proot < database/demo_users.sql
    ```
-5. Buka aplikasi: `http://localhost:8080/login.php`
+5. Akses aplikasi:
+   - Login page: `http://localhost:8080/login.php`
+   - Dashboard (setelah login): `http://localhost:8080/index.php`
 
-> **Catatan Demo Akun:**
-> *   Admin: `admin` / `admin12345`
-> *   HRD: `hrd` / `hrd12345`
+## Demo Akun
 
-## Menjalankan Pengujian (Bruno Test)
-Koleksi pengujian HTTP (Automated) tersedia di dalam folder `testing/bruno/`.
-1. Instal aplikasi **Bruno** (Open-source API Client).
-2. Buka folder/koleksi di `testing/bruno/` (seperti `auth`, `jabatan`, dll).
-3. **Penting:** Karena aplikasi ini berbasis Session PHP, hindari menekan tombol "Run All" apabila *sequence* belum terurut (Test Negatif > Login Valid > Logout). Jika ada request yang gagal/403, pastikan Anda memiliki *cookie* session valid dari file _Login Valid_.
+- **Admin:** `admin` / `admin12345`
+- **HRD:** `hrd` / `hrd12345`
 
-## Catatan Fondasi Keamanan
+## Menjalankan Testing (Bruno)
 
-- Password wajib disimpan menggunakan `password_hash()` dan diverifikasi dengan `password_verify()`.
-- Semua query yang menerima input pengguna harus memakai PDO prepared statements.
-- Kredensial database disimpan melalui environment variable, bukan hardcoded di source code.
-- Otorisasi dibatasi menggunakan helper `requireRole('ADMIN')` atau `'HR'` yang memeriksa array sesi saat runtime.
+Koleksi request ada di `testing/bruno/` (`auth`, `jabatan`, `karyawan`, `absensi`, `payroll`).
+
+Saran urutan test:
+1. Login valid
+2. Jalankan test modul
+3. Logout
+
+Karena aplikasi berbasis session, pastikan cookie login masih valid saat menjalankan request terproteksi.
+
+## Catatan Keamanan Dasar
+
+- Password disimpan dengan `password_hash()` dan dicek dengan `password_verify()`.
+- Query yang menerima input user harus memakai prepared statements.
+- Kredensial database disimpan di environment variable (`.env`), bukan hardcoded.
+- Otorisasi role dilakukan via `requireRole('ADMIN')` / `requireRole('HR')`.
