@@ -32,8 +32,8 @@ $bulanList = [
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="h3 mb-1">Penggajian</h1>
-        <p class="text-secondary mb-0">Kelola proses payroll perusahaan</p>
+        <h1 class="page-title mb-1">Penggajian</h1>
+        <p class="text-secondary mb-0">Kelola proses dan status payroll perusahaan</p>
     </div>
     <?php if ($user['role'] === 'ADMIN'): ?>
         <a href="/?page=payroll/proses" class="btn btn-primary">
@@ -101,7 +101,7 @@ if ($user['role'] === 'PEMIMPIN') {
 
 
 <!-- Filter Form -->
-<div class="card border-0 shadow-sm mb-4">
+<div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="/" class="row g-3 align-items-end">
             <input type="hidden" name="page" value="payroll/index">
@@ -137,13 +137,13 @@ if ($user['role'] === 'PEMIMPIN') {
     </div>
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="card">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-center">
+                <thead>
                     <tr>
-                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3 text-center" style="width: 50px;">No</th>
                         <th class="px-4 py-3">NIP</th>
                         <th class="px-4 py-3">Nama Karyawan</th>
                         <th class="px-4 py-3 text-center">Revisi</th>
@@ -151,7 +151,7 @@ if ($user['role'] === 'PEMIMPIN') {
                         <th class="px-4 py-3 text-end">Gaji Kotor</th>
                         <th class="px-4 py-3 text-end">PPh 21</th>
                         <th class="px-4 py-3 text-end">Gaji Bersih</th>
-                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3 text-center">Status</th>
                         <th class="px-4 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -159,14 +159,14 @@ if ($user['role'] === 'PEMIMPIN') {
                     <?php if (count($dataPayroll) > 0): ?>
                         <?php $no = 1; foreach ($dataPayroll as $row): ?>
                             <tr>
-                                <td class="px-4 py-3 text-center"><?= $no++ ?></td>
-                                <td class="px-4 py-3 text-center"><?= htmlspecialchars($row['nip'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td class="px-4 py-3 text-center text-muted"><?= $no++ ?></td>
+                                <td class="px-4 py-3 nip-code text-secondary"><?= htmlspecialchars($row['nip'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td class="px-4 py-3 fw-medium"><?= htmlspecialchars($row['nama'], ENT_QUOTES, 'UTF-8') ?></td>
-                                <td class="px-4 py-3 text-center">R<?= (int) $row['revisi'] ?></td>
-                                <td class="px-4 py-3 text-center"><span class="badge bg-info text-dark"><?= htmlspecialchars($row['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?></span></td>
-                                <td class="px-4 py-3 text-end"><?= formatCurrency((float) $row['gaji_kotor']) ?></td>
-                                <td class="px-4 py-3 text-end text-danger"><?= formatCurrency((float) $row['pph21']) ?></td>
-                                <td class="px-4 py-3 text-end text-success fw-bold"><?= formatCurrency((float) $row['gaji_bersih']) ?></td>
+                                <td class="px-4 py-3 text-center"><span class="badge bg-light text-secondary border">R<?= (int) $row['revisi'] ?></span></td>
+                                <td class="px-4 py-3"><span class="badge bg-light text-dark border"><?= htmlspecialchars($row['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?></span></td>
+                                <td class="px-4 py-3 text-end tabular-numbers"><?= formatCurrency((float) $row['gaji_kotor']) ?></td>
+                                <td class="px-4 py-3 text-end text-danger tabular-numbers"><?= formatCurrency((float) $row['pph21']) ?></td>
+                                <td class="px-4 py-3 text-end text-success fw-semibold tabular-numbers"><?= formatCurrency((float) $row['gaji_bersih']) ?></td>
                                 <td class="px-4 py-3 text-center">
                                     <?php
                                     $statusClass = ['Draft' => 'bg-warning text-dark', 'Processed' => 'bg-info text-dark', 'Paid' => 'bg-success', 'Corrected' => 'bg-secondary'];

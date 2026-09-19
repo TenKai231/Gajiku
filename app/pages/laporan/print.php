@@ -42,14 +42,32 @@ foreach ($dataPayroll as $row) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
     <title>Cetak Laporan - <?= htmlspecialchars($strPeriode, ENT_QUOTES, 'UTF-8') ?></title>
+    <link rel="icon" type="image/png" href="/assets/img/Gajiku_logo-removebg-preview.png">
+    <!-- Force light/print rendering — this page is always white paper -->
+    <script>
+        document.documentElement.removeAttribute('data-theme');
+        document.documentElement.removeAttribute('data-bs-theme');
+    </script>
     <style>
-        * { box-sizing: border-box; }
+        /* Force light — dokumen cetak selalu putih */
+        :root { color-scheme: light only; }
+
+        @media (prefers-color-scheme: dark) {
+            html, body { background: #fff !important; color: #0F172A !important; }
+            th, td { color: #0F172A !important; background-color: #fff !important; }
+            thead th { background: #eef2f7 !important; color: #0F172A !important; }
+            tfoot td { background: #eef2f7 !important; color: #0F172A !important; }
+        }
+
+        * { box-sizing: border-box; color: #0F172A; }
+        html { background: #fff; color: #0F172A; }
         body {
             margin: 0;
             padding: 24px;
-            background: #fff;
-            color: #0F172A;
+            background: #fff !important;
+            color: #0F172A !important;
             font-family: 'Segoe UI', 'Open Sans', Arial, sans-serif;
             font-size: 13px;
         }
@@ -65,16 +83,18 @@ foreach ($dataPayroll as $row) {
             border-collapse: collapse;
             margin-top: 8px;
         }
-        th, td { border: 1px solid #333; padding: 6px 8px; }
-        thead th { background: #eef2f7; text-align: center; font-size: 12px; text-transform: uppercase; }
-        tbody tr:nth-child(even) { background: #f7f9fc; }
+        th, td { border: 1px solid #333; padding: 6px 8px; color: #0F172A !important; background-color: #fff; }
+        thead th { background: #eef2f7 !important; color: #0F172A !important; text-align: center; font-size: 12px; text-transform: uppercase; }
+        tbody tr:nth-child(even) td { background: #f7f9fc !important; }
+        tfoot td { background: #eef2f7 !important; color: #0F172A !important; font-weight: 700; }
         .text-center { text-align: center; }
         .text-end { text-align: right; }
-        .text-danger { color: #c0392b; }
-        .text-success { color: #1e7e34; }
+        .text-danger { color: #c0392b !important; }
+        .text-success { color: #1e7e34 !important; }
         .fw-bold { font-weight: 700; }
-
-        tfoot td { background: #eef2f7; font-weight: 700; }
+        h2, h5, p, div, span, td, th { color: #0F172A !important; }
+        .text-danger { color: #c0392b !important; }
+        .text-success { color: #1e7e34 !important; }
 
         .ttd {
             margin-top: 48px;
@@ -98,10 +118,13 @@ foreach ($dataPayroll as $row) {
     </script>
 </head>
 <body>
-    <div class="kop">
-        <h2>LAPORAN REKAPITULASI PENGGAJIAN</h2>
-        <h5>Kantor Jaya Bersama</h5>
-        <p>Periode: <?= htmlspecialchars($strPeriode, ENT_QUOTES, 'UTF-8') ?></p>
+    <div class="kop" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
+        <img src="/assets/img/Gajiku_logo-removebg-preview.png" alt="Logo Gajiku" style="width: 76px; height: 76px; object-fit: contain;">
+        <div>
+            <h2>LAPORAN REKAPITULASI PENGGAJIAN</h2>
+            <h5>Kantor Jaya Bersama</h5>
+            <p>Periode: <?= htmlspecialchars($strPeriode, ENT_QUOTES, 'UTF-8') ?></p>
+        </div>
     </div>
 
     <table>

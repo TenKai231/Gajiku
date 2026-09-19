@@ -201,19 +201,64 @@ body {
   border-color: var(--border-color) !important;
 }
 
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-  font-family: 'Noto Serif', 'Nunito', serif;
+/* Page Title & Branding — Noto Serif */
+h1, .h1, .page-title, .brand-title {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1.25;
   color: var(--text-primary) !important;
 }
 
-h1 { font-size: 32px; }
-h2 { font-size: 24px; }
-h3 { font-size: 20px; }
-h4 { font-size: 18px; }
+/* Headings UI, Card Title, Subsections — Inter SemiBold */
+h2, .h2 {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--text-primary) !important;
+}
 
-code, .tech-number, .tabular-numbers {
+h3, .h3 {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text-primary) !important;
+}
+
+h4, .h4, h5, .h5, h6, .h6, .card-title, .card-header h5, .card-header h6 {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--text-primary) !important;
+}
+
+/* Technical Codes, NIP, Tabular Data */
+code, .tech-number, .tabular-numbers, .nip-code {
   font-family: 'JetBrains Mono', monospace;
   font-variant-numeric: tabular-nums;
+}
+
+/* Metric & KPI Cards */
+.metric-number, .kpi-number {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary) !important;
+}
+
+.metric-label, .kpi-label {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.metric-sublabel, .kpi-sublabel {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 /* Cards & Surface */
@@ -833,11 +878,21 @@ code, .tech-number, .tabular-numbers {
 
 .sidebar a.nav-link {
   color: var(--sidebar-text) !important;
-  padding: 10px 16px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 500;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  border-left: 3px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sidebar a.nav-link i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  margin-right: 8px;
 }
 
 .sidebar a.nav-link:hover {
@@ -849,6 +904,7 @@ code, .tech-number, .tabular-numbers {
   color: var(--sidebar-active-text) !important;
   background-color: var(--sidebar-active-bg) !important;
   border-left: 3px solid var(--sidebar-active-border) !important;
+  font-weight: 600;
 }
 
 .sidebar small {
@@ -982,3 +1038,21 @@ code, .tech-number, .tabular-numbers {
     color: #000000 !important;
   }
 }
+
+/* ==========================================================================
+   Logo Lighting & Glow Effect
+   ========================================================================== */
+.logo-glow {
+  filter: drop-shadow(0 2px 10px rgba(59, 130, 246, 0.4)) drop-shadow(0 0 18px rgba(251, 191, 36, 0.3));
+  transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-glow:hover {
+  filter: drop-shadow(0 4px 16px rgba(59, 130, 246, 0.6)) drop-shadow(0 0 24px rgba(251, 191, 36, 0.5));
+  transform: scale(1.04);
+}
+
+[data-theme="dark"] .logo-glow {
+  filter: drop-shadow(0 0 14px rgba(96, 165, 250, 0.55)) drop-shadow(0 0 22px rgba(251, 191, 36, 0.4));
+}
+

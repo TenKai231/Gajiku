@@ -49,10 +49,55 @@ $strPeriode = $namaBulan . ' ' . $t;
         border: 1px dashed #ccc;
         padding: 30px;
         background: #fff;
+        color: #0F172A;
     }
+
+    /* Dark mode: paksa slip gaji tetap tampak seperti kertas putih */
+    [data-theme="dark"] .slip-gaji,
+    [data-bs-theme="dark"] .slip-gaji {
+        background: #fff !important;
+        color: #0F172A !important;
+        border-color: #94A3B8 !important;
+    }
+
+    [data-theme="dark"] .slip-gaji *,
+    [data-bs-theme="dark"] .slip-gaji * {
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+    }
+
+    [data-theme="dark"] .slip-gaji .text-danger,
+    [data-bs-theme="dark"] .slip-gaji .text-danger {
+        color: #c0392b !important;
+    }
+
+    [data-theme="dark"] .slip-gaji .text-success,
+    [data-bs-theme="dark"] .slip-gaji .text-success {
+        color: #1e7e34 !important;
+    }
+
+    [data-theme="dark"] .slip-gaji .text-muted,
+    [data-bs-theme="dark"] .slip-gaji .text-muted {
+        color: #475569 !important;
+    }
+
+    [data-theme="dark"] .slip-gaji .bg-light,
+    [data-bs-theme="dark"] .slip-gaji .bg-light {
+        background-color: #F1F5F9 !important;
+    }
+
+    [data-theme="dark"] .slip-gaji .badge,
+    [data-bs-theme="dark"] .slip-gaji .badge {
+        color: inherit !important;
+    }
+
     @media print {
         .no-print { display: none !important; }
         .slip-gaji { border: none; margin: 0; padding: 0; box-shadow: none; max-width: none; }
+        .slip-gaji, .slip-gaji * { color: #0F172A !important; background-color: transparent !important; }
+        .slip-gaji .bg-light { background-color: #F1F5F9 !important; }
+        .slip-gaji .text-danger { color: #c0392b !important; }
+        .slip-gaji .text-success { color: #1e7e34 !important; }
     }
 </style>
 

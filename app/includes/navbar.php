@@ -16,8 +16,9 @@ function is_active($currentPage, $targetPage) {
 <!-- Sidebar -->
 <div class="sidebar d-flex flex-column vh-100">
     <div class="p-3 text-center border-bottom border-light border-opacity-25 mb-3">
-        <a href="/?page=dashboard" class="text-white text-decoration-none fs-4 fw-bold d-flex align-items-center justify-content-center">
-            <i class="bi bi-cash-stack me-2"></i>Gajiku
+        <a href="/?page=dashboard" class="text-white text-decoration-none fs-4 fw-bold d-flex align-items-center justify-content-center gap-2">
+            <img src="/assets/img/Gajiku_logo-removebg-preview.png" alt="Logo Gajiku" class="logo-glow" style="width: 48px; height: 48px; object-fit: contain;">
+            <span>Gajiku</span>
         </a>
     </div>
     
@@ -122,7 +123,7 @@ function is_active($currentPage, $targetPage) {
             <button type="button" id="sidebarToggle" onclick="toggleSidebar(event)" class="btn btn-outline-secondary btn-sm p-1 no-print" title="Sembunyikan/tampilkan menu" aria-label="Sembunyikan/tampilkan menu" aria-expanded="true">
                 <i class="bi bi-list fs-5" id="sidebarToggleIcon" style="pointer-events: none;"></i>
             </button>
-            <h5 class="mb-0 text-primary fw-bold d-none d-md-block">Sistem Informasi Penggajian</h5>
+            <span class="mb-0 text-primary fw-semibold fs-6 d-none d-md-block">Sistem Informasi Penggajian</span>
         </div>
 
         <div class="d-flex align-items-center gap-3 ms-auto">
@@ -131,9 +132,10 @@ function is_active($currentPage, $targetPage) {
                 <i class="bi bi-moon-stars fs-6" id="themeToggleIcon"></i>
             </button>
 
-            <div class="user-badge d-flex align-items-center px-3 py-1 rounded-pill border">
-                <span class="me-2 fw-medium"><i class="bi bi-person-circle text-primary fs-5"></i></span>
-                <span class="badge bg-primary rounded-pill"><?= htmlspecialchars((string) ($user['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
+            <div class="user-badge d-flex align-items-center px-3 py-1 rounded border gap-2">
+                <i class="bi bi-person-circle text-primary fs-5"></i>
+                <span class="fw-medium text-primary d-none d-sm-inline" style="font-size: 13px;"><?= htmlspecialchars((string) ($user['username'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="badge bg-primary text-white" style="font-size: 11px;"><?= htmlspecialchars((string) ($user['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
             <a class="btn btn-outline-danger btn-sm d-flex align-items-center px-3" href="/?action=auth/logout">
                 <i class="bi bi-box-arrow-right me-1"></i> Logout
