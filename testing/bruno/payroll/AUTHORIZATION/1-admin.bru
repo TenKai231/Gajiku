@@ -4,7 +4,7 @@ meta {
   seq: 1
 }
 post {
-  url: http://localhost:8080/?page=payroll/index
+  url: http://localhost:8080/?action=payroll/process
   body: formUrlEncoded
   auth: none
 }
@@ -15,6 +15,8 @@ body:form-urlencoded {
 
 tests {
   test("Admin boleh generate gaji", function() {
+    // ADMIN: payroll/process.php → success → 302 redirect ke ?page=payroll/proses&bulan&tahun
+    // Bruno follow-redirect default → final status 200 dari halaman proses.
     expect(res.getStatus()).to.be.oneOf([200, 302]);
   });
 }
