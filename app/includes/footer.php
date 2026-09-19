@@ -2,7 +2,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmxc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <!-- Custom JS -->
-    <script src="/assets/js/app.js"></script>
+    <?php
+    $jsVersion = file_exists(dirname(__DIR__, 2) . '/public/assets/js/app.js')
+        ? (string) filemtime(dirname(__DIR__, 2) . '/public/assets/js/app.js')
+        : '1.0';
+    ?>
+    <script src="assets/js/app.js?v=<?= $jsVersion ?>"></script>
+    <script>
+        if (typeof window.toggleGajikuTheme === 'undefined') {
+            document.write('<script src="/assets/js/app.js?v=<?= $jsVersion ?>"><\/script>');
+        }
+    </script>
 
     <!-- Manual Dropdown Fallback if Bootstrap JS fails to load -->
     <script>

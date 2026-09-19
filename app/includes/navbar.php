@@ -14,7 +14,7 @@ function is_active($currentPage, $targetPage) {
 }
 ?>
 <!-- Sidebar -->
-<div class="sidebar d-flex flex-column vh-100 sticky-top">
+<div class="sidebar d-flex flex-column vh-100">
     <div class="p-3 text-center border-bottom border-light border-opacity-25 mb-3">
         <a href="/?page=dashboard" class="text-white text-decoration-none fs-4 fw-bold d-flex align-items-center justify-content-center">
             <i class="bi bi-cash-stack me-2"></i>Gajiku
@@ -117,16 +117,21 @@ function is_active($currentPage, $targetPage) {
 <div class="main-content d-flex flex-column w-100 min-vh-100">
     
     <!-- Topbar -->
-    <header class="bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center border-bottom sticky-top" style="z-index: 1020;">
+    <header class="shadow-sm px-4 py-3 d-flex justify-content-between align-items-center sticky-top" style="z-index: 1020;">
         <div class="d-flex align-items-center gap-3">
-            <button type="button" id="sidebarToggle" class="btn btn-outline-secondary btn-sm p-1 no-print" title="Sembunyikan/tampilkan menu" aria-label="Sembunyikan/tampilkan menu" aria-expanded="true">
-                <i class="bi bi-list fs-5" id="sidebarToggleIcon"></i>
+            <button type="button" id="sidebarToggle" onclick="toggleSidebar(event)" class="btn btn-outline-secondary btn-sm p-1 no-print" title="Sembunyikan/tampilkan menu" aria-label="Sembunyikan/tampilkan menu" aria-expanded="true">
+                <i class="bi bi-list fs-5" id="sidebarToggleIcon" style="pointer-events: none;"></i>
             </button>
             <h5 class="mb-0 text-primary fw-bold d-none d-md-block">Sistem Informasi Penggajian</h5>
         </div>
-        
+
         <div class="d-flex align-items-center gap-3 ms-auto">
-            <div class="text-dark d-flex align-items-center bg-light px-3 py-1 rounded-pill border">
+            <!-- Theme Toggle Button -->
+            <button type="button" id="themeToggle" onclick="toggleGajikuTheme()" class="theme-toggle-btn btn btn-sm no-print" aria-label="Ganti mode gelap atau terang" aria-pressed="false" title="Ganti mode gelap/terang">
+                <i class="bi bi-moon-stars fs-6" id="themeToggleIcon"></i>
+            </button>
+
+            <div class="user-badge d-flex align-items-center px-3 py-1 rounded-pill border">
                 <span class="me-2 fw-medium"><i class="bi bi-person-circle text-primary fs-5"></i></span>
                 <span class="badge bg-primary rounded-pill"><?= htmlspecialchars((string) ($user['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
             </div>

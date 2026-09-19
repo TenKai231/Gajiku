@@ -253,70 +253,163 @@ $bulanArr = [
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    function isDark() {
+        return document.documentElement.getAttribute('data-theme') === 'dark';
+    }
+
+    function getChartTheme() {
+        var dark = isDark();
+        return {
+            textColor: dark ? '#94A3B8' : '#64748B',
+            gridColor: dark ? '#24344C' : '#E2E8F0',
+            trendBorder: dark ? '#3B82C4' : '#1E3A5F',
+            trendBg: dark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(30, 58, 95, 0.1)',
+            statusColors: dark ? ['#94A3B8', '#4ADE80'] : ['#6B7280', '#16A34A'],
+            kehadiranColors: dark
+                ? ['#4ADE80', '#FBBF24', '#60A5FA', '#F87171', '#94A3B8']
+                : ['#16A34A', '#CA8A04', '#2563EB', '#DC2626', '#6B7280'],
+            telatColor: dark ? '#F87171' : '#DC2626'
+        };
+    }
+
+    var theme = getChartTheme();
+    Chart.defaults.color = theme.textColor;
+    Chart.defaults.borderColor = theme.gridColor;
+
     // 1. Tren Payroll (Line)
-    new Chart(document.getElementById('trendChart'), {
+    var trendChart = new Chart(document.getElementById('trendChart'), {
         type: 'line',
         data: {
             labels: <?= json_encode($labelTren) ?>,
             datasets: [{
                 label: 'Total Gaji Bersih (Rp)',
                 data: <?= json_encode($dataTren) ?>,
-                borderColor: '#1E3A5F',
-                backgroundColor: 'rgba(30, 58, 95, 0.1)',
+                borderColor: theme.trendBorder,
+                backgroundColor: theme.trendBg,
                 borderWidth: 2,
                 fill: true,
                 tension: 0.3
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: theme.gridColor }, ticks: { color: theme.textColor } },
+                y: { grid: { color: theme.gridColor }, ticks: { color: theme.textColor } }
+            }
+        }
     });
 
     // 2. Status Payroll (Donut)
-    new Chart(document.getElementById('statusChart'), {
+    var statusChart = new Chart(document.getElementById('statusChart'), {
         type: 'doughnut',
         data: {
             labels: ['Processed', 'Paid'],
             datasets: [{
                 data: [<?= $statusProcessed ?>, <?= $statusPaid ?>],
-                backgroundColor: ['#6B7280', '#16A34A'],
+                backgroundColor: theme.statusColors,
                 borderWidth: 0
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { labels: { color: theme.textColor } }
+            }
+        }
     });
 
     // 3. Kehadiran (Bar)
-    new Chart(document.getElementById('kehadiranChart'), {
+    var kehadiranChart = new Chart(document.getElementById('kehadiranChart'), {
         type: 'bar',
         data: {
             labels: ['Hadir', 'Sakit', 'Izin', 'Alpha', 'Cuti'],
             datasets: [{
                 label: 'Total Kehadiran',
                 data: [
-                    <?= $rekapKehadiran['Hadir'] ?? 0 ?>, 
-                    <?= $rekapKehadiran['Sakit'] ?? 0 ?>, 
-                    <?= $rekapKehadiran['Izin'] ?? 0 ?>, 
-                    <?= $rekapKehadiran['Alpha'] ?? 0 ?>, 
+                    <?= $rekapKehadiran['Hadir'] ?? 0 ?>,
+                    <?= $rekapKehadiran['Sakit'] ?? 0 ?>,
+                    <?= $rekapKehadiran['Izin'] ?? 0 ?>,
+                    <?= $rekapKehadiran['Alpha'] ?? 0 ?>,
                     <?= $rekapKehadiran['Cuti'] ?? 0 ?>
                 ],
-                backgroundColor: ['#16A34A', '#CA8A04', '#2563EB', '#DC2626', '#6B7280']
+                backgroundColor: theme.kehadiranColors
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: theme.gridColor }, ticks: { color: theme.textColor } },
+                y: { grid: { color: theme.gridColor }, ticks: { color: theme.textColor } }
+            }
+        }
     });
 
     // 4. Keterlambatan (Bar)
-    new Chart(document.getElementById('keterlambatanChart'), {
+    var keterlambatanChart = new Chart(document.getElementById('keterlambatanChart'), {
         type: 'bar',
         data: {
             labels: <?= json_encode($labelTelat) ?>,
             datasets: [{
                 label: 'Total Keterlambatan',
                 data: <?= json_encode($jumlahTelat) ?>,
-                backgroundColor: '#DC2626'
+                backgroundColor: theme.telatColor
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: theme.gridColor }, ticks: { color: theme.textColor } },
+                y: { grid: { color: theme.gridColor }, ticks: { color: theme.textColor } }
+            }
+        }
+    });
+
+    // Sinkronisasi dinamis saat toggle tema diklik
+    window.addEventListener('gajiku:themeChanged', function() {
+        var newTheme = getChartTheme();
+        Chart.defaults.color = newTheme.textColor;
+        Chart.defaults.borderColor = newTheme.gridColor;
+
+        // Update Tren
+        trendChart.data.datasets[0].borderColor = newTheme.trendBorder;
+        trendChart.data.datasets[0].backgroundColor = newTheme.trendBg;
+        trendChart.options.scales.x.grid.color = newTheme.gridColor;
+        trendChart.options.scales.x.ticks.color = newTheme.textColor;
+        trendChart.options.scales.y.grid.color = newTheme.gridColor;
+        trendChart.options.scales.y.ticks.color = newTheme.textColor;
+        trendChart.update();
+
+        // Update Status
+        statusChart.data.datasets[0].backgroundColor = newTheme.statusColors;
+        if (statusChart.options.plugins && statusChart.options.plugins.legend) {
+            statusChart.options.plugins.legend.labels.color = newTheme.textColor;
+        }
+        statusChart.update();
+
+        // Update Kehadiran
+        kehadiranChart.data.datasets[0].backgroundColor = newTheme.kehadiranColors;
+        kehadiranChart.options.scales.x.grid.color = newTheme.gridColor;
+        kehadiranChart.options.scales.x.ticks.color = newTheme.textColor;
+        kehadiranChart.options.scales.y.grid.color = newTheme.gridColor;
+        kehadiranChart.options.scales.y.ticks.color = newTheme.textColor;
+        kehadiranChart.update();
+
+        // Update Keterlambatan
+        keterlambatanChart.data.datasets[0].backgroundColor = newTheme.telatColor;
+        keterlambatanChart.options.scales.x.grid.color = newTheme.gridColor;
+        keterlambatanChart.options.scales.x.ticks.color = newTheme.textColor;
+        keterlambatanChart.options.scales.y.grid.color = newTheme.gridColor;
+        keterlambatanChart.options.scales.y.ticks.color = newTheme.textColor;
+        keterlambatanChart.update();
     });
 });
 </script>
