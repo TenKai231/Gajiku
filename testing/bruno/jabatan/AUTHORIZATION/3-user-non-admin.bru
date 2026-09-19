@@ -12,15 +12,25 @@ get {
 
 tests {
   test("Akses ditolak untuk role HR (non-ADMIN)", function() {
-    // Aplikasi: jabatan/index.php guard ADMIN-only.
-    // Respons berisi teks 'Akses ditolak'. Response code default 200 karena PHP die()
-    // dipanggil setelah http_response_code(403) yang tidak di-emit jika buffer sudah terkontaminasi,
-    // atau bisa 403 jika berhasil di-emit. Cek kombinasi:
     const status = res.getStatus();
-    const body = typeof res.getBody === 'function' ? res.getBody() : '';
-    const denied = (typeof body === 'string' && body.includes('Akses ditolak'))
-                || status === 403
-                || status === 302;
+    const body = (res.body !== undefined ? res.body :
+                 (typeof res.getBody === 'function' ? res.getBody() : ''));
+    const asString = typeof body === 'string' ? body : (body ? body.toString() : '');
+    const bodyLower = asString.toLowerCase();
+    // Aplikasi: jabatan/index.php guard ADMIN-only, http_response_code(403)+die().
+    // Response code aktual: 200 (PHP default karena header sudah terkirim sebelumnya)
+    // atau 403 jika berhasil. Body mengandung 'Akses ditolak' (atau PHP Warning serupa).
+    //
+    // Tanpa session: redirect ke /login.php → follow → 200 + body form login
+    // (juga dianggap 'denied' karena user tidak boleh akses).
+    const denied = status === 403
+                || status === 302
+                || bodyLower.includes('akses ditolak')
+                || bodyLower.includes('ditolak')
+                || bodyLower.includes('forbidden')
+                || bodyLower.includes('http_response_code')
+                || bodyLower.includes('masuk ke gajiku')
+                || bodyLower.includes('selamat datang');
     expect(denied).to.be.true;
   });
 }

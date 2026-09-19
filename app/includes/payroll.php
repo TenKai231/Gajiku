@@ -56,6 +56,97 @@ function fetchPenggajianRekapByPeriode(PDO $pdo, string $periode): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Ambil total rekap (aktif/terbaru per karyawan) untuk satu periode.
+ * Sama persis logikanya dengan fetchPenggajianRekapByPeriode agar
+ * angka Dashboard = angka Laporan (tidak dobel hitung Corrected).
+ */
+function fetchRekapSumByPeriode(PDO $pdo, string $periode): array
+{
+    $stmt = $pdo->prepare(
+        "SELECT SUM(p.gaji_kotor) AS total_kotor, SUM(p.gaji_bersih) AS total_bersih
+         FROM penggajian p
+         WHERE p.periode = :periode
+           AND p.status <> 'Corrected'
+           AND p.revisi = (
+               SELECT MAX(p2.revisi)
+               FROM penggajian p2
+               WHERE p2.karyawan_id = p.karyawan_id
+                 AND p2.periode = p.periode
+                 AND p2.status <> 'Corrected'
+           )"
+    );
+    $stmt->execute([':periode' => $periode]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return [
+        'total_kotor' => (float) ($row['total_kotor'] ?? 0),
+        'total_bersih' => (float) ($row['total_bersih'] ?? 0),
+    ];
+}
+
+/**
+ * Tren payroll rekap (hanya revisi aktif per karyawan per periode).
+ */
+function fetchTrenPayrollRekap(PDO $pdo, int $limit = 6): array
+{
+    $limit = max(1, min(24, $limit));
+    $stmt = $pdo->query(
+        "SELECT p.periode, SUM(p.gaji_bersih) as total_gaji
+         FROM penggajian p
+         WHERE p.status <> 'Corrected'
+           AND p.revisi = (
+               SELECT MAX(p2.revisi)
+               FROM penggajian p2
+               WHERE p2.karyawan_id = p.karyawan_id
+                 AND p2.periode = p.periode
+                 AND p2.status <> 'Corrected'
+           )
+         GROUP BY p.periode
+         ORDER BY SUBSTRING(p.periode, 4, 4) ASC, SUBSTRING(p.periode, 1, 2) ASC
+         LIMIT {$limit}"
+    );
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Hitung status payroll hanya dari revisi aktif (samakan dengan laporan).
+ */
+function fetchStatusCountRekapByPeriode(PDO $pdo, string $periode): array
+{
+    $stmt = $pdo->prepare(
+        "SELECT p.status, COUNT(*) as jumlah
+         FROM penggajian p
+         WHERE p.periode = :periode
+           AND p.status <> 'Corrected'
+           AND p.revisi = (
+               SELECT MAX(p2.revisi)
+               FROM penggajian p2
+               WHERE p2.karyawan_id = p.karyawan_id
+                 AND p2.periode = p.periode
+                 AND p2.status <> 'Corrected'
+           )
+         GROUP BY p.status"
+    );
+    $stmt->execute([':periode' => $periode]);
+    return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+}
+
+/**
+ * Ambil periode terbaru yang ada datanya (format MM-YYYY), atau null jika kosong.
+ */
+function getPeriodeTerbaru(PDO $pdo): ?string
+{
+    $stmt = $pdo->query(
+        "SELECT periode FROM penggajian
+         GROUP BY periode
+         ORDER BY SUBSTRING(periode, 4, 4) DESC, SUBSTRING(periode, 1, 2) DESC
+         LIMIT 1"
+    );
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? (string) $row['periode'] : null;
+}
+
 function cekPenggajianSudahAda(PDO $pdo, string $periode): bool
 {
     $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM penggajian WHERE periode = :periode');

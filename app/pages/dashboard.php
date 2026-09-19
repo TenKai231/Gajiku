@@ -7,39 +7,45 @@ $user = currentUser();
 
 require_once dirname(__DIR__, 1) . '/config/database.php';
 require_once dirname(__DIR__, 1) . '/includes/jabatan.php';
+require_once dirname(__DIR__, 1) . '/includes/payroll.php';
 $pdo = getPDO();
+
+// Periode payroll acuan dashboard: pakai periode terbaru yang ada datanya
+// agar konsisten dengan halaman Laporan (bukan hardcode bulan).
+$periodeTerbaru = getPeriodeTerbaru($pdo);
+$bulanIni = $periodeTerbaru ?? date('m-Y');
+list($blnIni, $thnIni) = explode('-', $bulanIni);
 
 // 1. Total Karyawan Aktif
 $stmtKaryawan = $pdo->query("SELECT COUNT(*) FROM karyawan WHERE status = 'Aktif'");
 $totalKaryawan = (int) $stmtKaryawan->fetchColumn();
 
-// 2. Kehadiran Hari Ini
-$hariIni = date('m') == '09' ? '2026-08-31' : date('Y-m-d');
+// 2. Kehadiran Hari Ini (fallback ke tanggal absensi terakhir bila hari ini kosong,
+//    supaya angka tidak 0 padahal data demo ada di bulan lalu)
+$hariIni = date('Y-m-d');
 $stmtHadir = $pdo->prepare("SELECT COUNT(*) FROM absensi WHERE tanggal = :tanggal AND status = 'Hadir'");
 $stmtHadir->execute([':tanggal' => $hariIni]);
 $totalHadirHariIni = (int) $stmtHadir->fetchColumn();
+$tanggalHadirLabel = $hariIni;
+if ($totalHadirHariIni === 0) {
+    $tglTerakhir = $pdo->query("SELECT MAX(tanggal) FROM absensi")->fetchColumn();
+    if ($tglTerakhir) {
+        $stmtHadir->execute([':tanggal' => $tglTerakhir]);
+        $totalHadirHariIni = (int) $stmtHadir->fetchColumn();
+        $tanggalHadirLabel = (string) $tglTerakhir;
+    }
+}
 
-// 3. Total Payroll (Kotor) Bulan Ini
-$bulanIni = date('m') == '09' ? '08-2026' : date('m-Y');
-$stmtPayrollKotor = $pdo->prepare("SELECT SUM(gaji_kotor) FROM penggajian WHERE periode = :periode");
-$stmtPayrollKotor->execute([':periode' => $bulanIni]);
-$totalPayrollKotor = (float) $stmtPayrollKotor->fetchColumn();
+// 3+4. Total Payroll (Kotor & Bersih) — pakai logika REKAP yang sama dengan
+// halaman Laporan: hanya revisi aktif per karyawan, status Corrected dikecualikan.
+// (Sebelumnya dashboard pakai SUM mentah semua baris sehingga histori Corrected
+// ikut terhitung dobel dan angkanya lebih besar dari laporan.)
+$rekapSum = fetchRekapSumByPeriode($pdo, $bulanIni);
+$totalPayrollKotor = $rekapSum['total_kotor'];
+$totalPayrollBersih = $rekapSum['total_bersih'];
 
-// 4. Total Payroll (Bersih) Bulan Ini
-$stmtPayrollBersih = $pdo->prepare("SELECT SUM(gaji_bersih) FROM penggajian WHERE periode = :periode");
-$stmtPayrollBersih->execute([':periode' => $bulanIni]);
-$totalPayrollBersih = (float) $stmtPayrollBersih->fetchColumn();
-
-// 5. Rekap Tren Payroll (Untuk Line Chart)
-$stmtTren = $pdo->query("
-    SELECT periode, SUM(gaji_bersih) as total_gaji
-    FROM penggajian
-    GROUP BY periode
-    ORDER BY SUBSTRING(periode, 4, 4) ASC, SUBSTRING(periode, 1, 2) ASC
-    LIMIT 6
-");
-$trenPayroll = $stmtTren->fetchAll(PDO::FETCH_ASSOC);
-
+// 5. Rekap Tren Payroll (rekap aktif saja, samakan dengan laporan)
+$trenPayroll = fetchTrenPayrollRekap($pdo, 6);
 $labelTren = [];
 $dataTren = [];
 foreach ($trenPayroll as $t) {
@@ -47,15 +53,12 @@ foreach ($trenPayroll as $t) {
     $dataTren[] = (float) $t['total_gaji'];
 }
 
-// 6. Status Payroll Bulan Ini (Untuk Donut Chart)
-$stmtStatus = $pdo->prepare("SELECT status, COUNT(*) as jumlah FROM penggajian WHERE periode = :periode GROUP BY status");
-$stmtStatus->execute([':periode' => $bulanIni]);
-$statusPayrollData = $stmtStatus->fetchAll(PDO::FETCH_KEY_PAIR);
+// 6. Status Payroll Bulan Ini (Untuk Donut Chart) — rekap aktif saja
+$statusPayrollData = fetchStatusCountRekapByPeriode($pdo, $bulanIni);
 $statusProcessed = $statusPayrollData['Processed'] ?? 0;
 $statusPaid = $statusPayrollData['Paid'] ?? 0;
 
 // 7. Rekap Kehadiran Bulan Ini (Untuk Bar Chart)
-list($blnIni, $thnIni) = explode('-', $bulanIni);
 $stmtKehadiranChart = $pdo->prepare("
     SELECT status, COUNT(*) as total 
     FROM absensi 
@@ -100,7 +103,7 @@ $bulanArr = [
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
         <h1 class="h3 mb-1">Dashboard</h1>
-        <p class="text-secondary mb-0">Overview sistem penggajian</p>
+        <p class="text-secondary mb-0">Overview sistem penggajian — periode <?= htmlspecialchars($bulanIni, ENT_QUOTES, 'UTF-8') ?></p>
     </div>
 </div>
 
@@ -119,6 +122,7 @@ $bulanArr = [
             <div class="card-body">
                 <h6 class="card-title text-muted mb-2"><i class="bi bi-calendar-check-fill me-2 text-success"></i> Hadir</h6>
                 <h3 class="fw-bold mb-0 text-dark"><?= $totalHadirHariIni ?></h3>
+                <small class="text-muted"><?= htmlspecialchars($tanggalHadirLabel, ENT_QUOTES, 'UTF-8') ?></small>
             </div>
         </div>
     </div>
