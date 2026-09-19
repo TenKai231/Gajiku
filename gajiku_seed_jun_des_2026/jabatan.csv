@@ -1,0 +1,16 @@
+﻿id,nama_jabatan,gaji_pokok,tunjangan_default
+1,Admin,4800000,500000
+2,HRD,5500000,650000
+3,Manager Operasional,8500000,1500000
+4,Supervisor Operasional,7800000,1200000
+5,Staff Administrasi,4200000,350000
+6,Staff Administrasi Junior,3800000,250000
+7,Staff Keuangan,5100000,500000
+8,Staff Payroll,5000000,450000
+9,Staff IT,6200000,700000
+10,Customer Service,4300000,300000
+11,Staff Gudang,4500000,350000
+12,Staff Operasional,4600000,400000
+13,Koordinator Administrasi,6500000,900000
+14,Kepala Keuangan,9200000,1600000
+15,Staff HR,4400000,350000

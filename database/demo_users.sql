@@ -8,3 +8,4 @@ VALUES
 ON DUPLICATE KEY UPDATE
     password = VALUES(password),
     role = VALUES(role);
+kenap

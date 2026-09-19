@@ -123,6 +123,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
     </div>
 </div>
 
+
 <!-- Profil Ringkas Karyawan -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
@@ -167,6 +168,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
     </div>
 </div>
 
+
 <!-- Filter Periode Absensi -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
@@ -193,6 +195,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
         </form>
     </div>
 </div>
+
 
 <!-- KPI Summary Attendance Cards -->
 <div class="row g-3 mb-4">
@@ -239,6 +242,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
         </div>
     </div>
 </div>
+
 
 <!-- Row: Kalender Absensi + Distribusi Kehadiran & Uang Makan -->
 <div class="row g-4 mb-4">
@@ -398,6 +402,10 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
                         <div class="progress-bar bg-dark" style="width: <?= min(100, $pctAlpha) ?>%"></div>
                     </div>
                 </div>
+                <div class="border-top mt-4 pt-3">
+                    <div class="small text-muted mb-2">Komposisi status absensi</div>
+                    <div style="height: 220px;"><canvas id="attendancePieChart" aria-label="Grafik komposisi status absensi"></canvas></div>
+                </div>
             </div>
         </div>
 
@@ -440,6 +448,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
         </div>
     </div>
 </div>
+
 
 <!-- Riwayat Absensi Periode Ini -->
 <div class="card border-0 shadow-sm mb-4">
@@ -516,6 +525,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
     </div>
 </div>
 
+
 <!-- Riwayat Penggajian Karyawan -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
@@ -581,6 +591,7 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
         </div>
     </div>
 </div>
+
 
 <!-- Tab / Accordion: Data Pajak & Data BPJS -->
 <div class="row g-4 mb-4">
@@ -731,3 +742,32 @@ $uangMakanNeto = max(0, $uangMakanBruto - $potonganMakanTelat);
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('attendancePieChart');
+    if (!canvas) return;
+    new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: ['Hadir', 'Sakit', 'Izin', 'Cuti', 'Alpha'],
+            datasets: [{
+                data: [<?= $hadir ?>, <?= $sakit ?>, <?= $izin ?>, <?= $cuti ?>, <?= $alpha ?>],
+                backgroundColor: ['#16a34a', '#ca8a04', '#2563eb', '#6b7280', '#dc2626'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '58%',
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: { callbacks: { label: context => ' ' + context.label + ': ' + context.raw + ' hari' } }
+            }
+        }
+    });
+});
+</script>
+

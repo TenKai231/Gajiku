@@ -94,7 +94,8 @@ INSERT INTO tarif_ter (kategori, min_bruto, max_bruto, tarif, berlaku_mulai, ber
 ('B', 414000000.01, NULL, 0.3400, '2024-01-01', NULL);
 
 -- Kategori C
-INSERT INTO tarif_ter (kategori, min_bruto, max_bruto, tarif, berlaku_mulai, berlaku_sampai) VALUES
+INSERT INTO tarif_ter (kategori, min_bruto, max_bruto, tarif, berlaku_
+mulai, berlaku_sampai) VALUES
 ('C', 0.00, 6600000.00, 0.0000, '2024-01-01', NULL),
 ('C', 6600000.01, 6950000.00, 0.0025, '2024-01-01', NULL),
 ('C', 6950000.01, 7350000.00, 0.0050, '2024-01-01', NULL),

@@ -13,8 +13,21 @@ $pdo = getPDO();
 // Periode payroll acuan dashboard: pakai periode terbaru yang ada datanya
 // agar konsisten dengan halaman Laporan (bukan hardcode bulan).
 $periodeTerbaru = getPeriodeTerbaru($pdo);
-$bulanIni = $periodeTerbaru ?? date('m-Y');
-list($blnIni, $thnIni) = explode('-', $bulanIni);
+$periodeDefault = $periodeTerbaru ?? date('m-Y');
+$periodeInput = trim((string) ($_GET['periode'] ?? ''));
+
+$stmtPeriode = $pdo->query("\n    SELECT periode FROM penggajian\n    UNION\n    SELECT DATE_FORMAT(tanggal, '%m-%Y') FROM absensi\n    ORDER BY STR_TO_DATE(periode, '%m-%Y') DESC\n");
+$periodeList = $stmtPeriode->fetchAll(PDO::FETCH_COLUMN);
+if ($periodeDefault !== '' && !in_array($periodeDefault, $periodeList, true)) {
+    array_unshift($periodeList, $periodeDefault);
+}
+
+$bulanIni = in_array($periodeInput, $periodeList, true) ? $periodeInput : $periodeDefault;
+if (!preg_match('/^(0[1-9]|1[0-2])-([0-9]{4})$/', $bulanIni, $periodeMatch)) {
+    $bulanIni = date('m-Y');
+    $periodeList[] = $bulanIni;
+}
+[$blnIni, $thnIni] = [$periodeMatch[1], $periodeMatch[2]];
 
 // 1. Total Karyawan Aktif
 $stmtKaryawan = $pdo->query("SELECT COUNT(*) FROM karyawan WHERE status = 'Aktif'");
@@ -100,11 +113,26 @@ $bulanArr = [
 ];
 ?>
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
     <div>
         <h1 class="page-title mb-1">Dashboard</h1>
         <p class="text-secondary mb-0">Overview sistem penggajian — periode <?= htmlspecialchars($bulanIni, ENT_QUOTES, 'UTF-8') ?></p>
     </div>
+    <form method="get" class="d-flex align-items-end gap-2" aria-label="Filter periode kehadiran">
+        <input type="hidden" name="page" value="dashboard">
+        <div>
+            <label for="periode" class="form-label small mb-1">Periode kehadiran</label>
+            <select id="periode" name="periode" class="form-select">
+                <?php foreach ($periodeList as $periode): ?>
+                    <?php [$bulan, $tahun] = explode('-', $periode); ?>
+                    <option value="<?= htmlspecialchars($periode, ENT_QUOTES, 'UTF-8') ?>" <?= $periode === $bulanIni ? 'selected' : '' ?>>
+                        <?= htmlspecialchars(($bulanArr[$bulan] ?? $bulan) . ' ' . $tahun, ENT_QUOTES, 'UTF-8') ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-filter me-1"></i>Filter</button>
+    </form>
 </div>
 
 <!-- TOP KPI ROW -->
@@ -199,7 +227,7 @@ $bulanArr = [
     <div class="col-12 col-lg-6">
         <div class="card h-100">
             <div class="card-header pt-3 pb-3">
-                <h6 class="card-title fw-semibold">Kehadiran Bulan Ini</h6>
+                <h6 class="card-title fw-semibold">Kehadiran <?= htmlspecialchars($bulanArr[$blnIni] ?? $blnIni, ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($thnIni, ENT_QUOTES, 'UTF-8') ?></h6>
             </div>
             <div class="card-body">
                 <canvas id="kehadiranChart" style="max-height: 260px;"></canvas>
@@ -211,7 +239,7 @@ $bulanArr = [
     <div class="col-12 col-lg-6">
         <div class="card h-100">
             <div class="card-header pt-3 pb-3">
-                <h6 class="card-title fw-semibold">Top 5 Keterlambatan</h6>
+                <h6 class="card-title fw-semibold">Top 5 Keterlambatan — <?= htmlspecialchars($bulanArr[$blnIni] ?? $blnIni, ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($thnIni, ENT_QUOTES, 'UTF-8') ?></h6>
             </div>
             <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 260px;">
                 <?php if (count($dataTelat) > 0): ?>

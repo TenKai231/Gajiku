@@ -687,6 +687,33 @@ http_response_code(200);
             stroke: #D97706;
         }
 
+        @keyframes login-lamp-flicker {
+            0%, 100% { opacity: 1; }
+            12% { opacity: 0.2; }
+            24% { opacity: 0.9; }
+            38% { opacity: 0.35; }
+            52% { opacity: 1; }
+            68% { opacity: 0.55; }
+            82% { opacity: 1; }
+        }
+
+        .login-lamp-widget.lamp-flickering .login-lamp-halo,
+        .login-aside.lamp-flickering .aside-spotlight {
+            animation: login-lamp-flicker 0.9s ease-out;
+        }
+
+        .login-aside.lamp-flickering .aside-illustration {
+            animation: login-lamp-flicker 0.9s ease-out;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .login-lamp-widget.lamp-flickering .login-lamp-halo,
+            .login-aside.lamp-flickering .aside-spotlight,
+            .login-aside.lamp-flickering .aside-illustration {
+                animation: none;
+            }
+        }
+
         .login-lamp-handle {
             cursor: grab;
             cursor: -webkit-grab;
@@ -994,10 +1021,22 @@ http_response_code(200);
 
             var aside = document.getElementById('loginAside') || document.querySelector('.login-aside');
 
-            function syncLampWithTheme(theme) {
+            function syncLampWithTheme(theme, shouldFlicker) {
                 // Mode dark  = Lampu HIDUP (menyinari ruangan malam dengan spotlight)
                 // Mode light = Lampu MATI (siang hari, spotlight padam)
                 var isLampOn = (theme === 'dark');
+
+                if (shouldFlicker && isLampOn) {
+                    widget.classList.remove('lamp-flickering');
+                    if (aside) aside.classList.remove('lamp-flickering');
+                    void widget.offsetWidth;
+                    widget.classList.add('lamp-flickering');
+                    if (aside) aside.classList.add('lamp-flickering');
+                    window.setTimeout(function () {
+                        widget.classList.remove('lamp-flickering');
+                        if (aside) aside.classList.remove('lamp-flickering');
+                    }, 950);
+                }
 
                 if (isLampOn) {
                     widget.classList.add('on');
@@ -1017,11 +1056,11 @@ http_response_code(200);
             }
 
             var initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            syncLampWithTheme(initialTheme);
+            syncLampWithTheme(initialTheme, false);
 
             window.addEventListener('gajiku:themeChanged', function (e) {
                 if (e.detail && e.detail.theme) {
-                    syncLampWithTheme(e.detail.theme);
+                    syncLampWithTheme(e.detail.theme, true);
                 }
             });
 
