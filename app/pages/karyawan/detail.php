@@ -113,17 +113,17 @@ $bpjsProfile = $stmtBpjs->fetch(PDO::FETCH_ASSOC);
                         <label for="nik" class="form-label">NIK (Nomor Induk Kependudukan)</label>
                         <input type="text" class="form-control" id="nik" name="nik" required
                                value="<?= htmlspecialchars($taxProfile['nik'] ?? '', ENT_QUOTES) ?>"
-                               <?= $user['role'] !== 'ADMIN' && $user['role'] !== 'HR' && $user['role'] !== 'FINANCE' ? 'readonly' : '' ?>>
+                               <?= !in_array($user['role'], ['ADMIN', 'HR'], true) ? 'readonly' : '' ?>>
                     </div>
                     <div class="mb-3">
                         <label for="npwp" class="form-label">NPWP (Opsional)</label>
                         <input type="text" class="form-control" id="npwp" name="npwp"
                                value="<?= htmlspecialchars($taxProfile['npwp'] ?? '', ENT_QUOTES) ?>"
-                               <?= $user['role'] !== 'ADMIN' && $user['role'] !== 'HR' && $user['role'] !== 'FINANCE' ? 'readonly' : '' ?>>
+                               <?= !in_array($user['role'], ['ADMIN', 'HR'], true) ? 'readonly' : '' ?>>
                     </div>
                     <div class="mb-3">
                         <label for="status_ptkp" class="form-label">Status PTKP</label>
-                        <?php if ($user['role'] === 'ADMIN' || $user['role'] === 'HR' || $user['role'] === 'FINANCE'): ?>
+                        <?php if (in_array($user['role'], ['ADMIN', 'HR'], true)): ?>
                         <select class="form-select" id="status_ptkp" name="status_ptkp" required>
                             <option value="">Pilih Status PTKP...</option>
                             <?php
@@ -148,7 +148,7 @@ $bpjsProfile = $stmtBpjs->fetch(PDO::FETCH_ASSOC);
                     </div>
                     <?php endif; ?>
 
-                    <?php if ($user['role'] === 'ADMIN' || $user['role'] === 'HR' || $user['role'] === 'FINANCE'): ?>
+                    <?php if (in_array($user['role'], ['ADMIN', 'HR'], true)): ?>
                     <div class="text-end mt-4">
                         <button type="submit" class="btn btn-primary">
                             <?= $taxProfile ? 'Update Data Pajak' : 'Simpan Data Pajak' ?>

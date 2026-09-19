@@ -3,10 +3,12 @@ USE penggajian_db;
 -- Demo credentials:
 -- admin / admin12345
 -- hrd / hrd12345
+-- pemimpin / pemimpin12345
 INSERT INTO users (username, password, role)
 VALUES
     ('admin', '$2y$12$EmLWFcSUpU7cyQyEEo3DTe4BipF2XE/t57K5WfiRW7AOEBU0/fBmi', 'ADMIN'),
-    ('hrd', '$2y$12$GanuIYv.xyRskDG180iWKuT40Z60XKzR43KT2C8sFdcdHN2l97zRK', 'HR');
+    ('hrd', '$2y$12$GanuIYv.xyRskDG180iWKuT40Z60XKzR43KT2C8sFdcdHN2l97zRK', 'HR'),
+    ('pemimpin', '$2y$12$cN0bk/Yv0IveCFzttf0Z9..A0VVNPrpoBIiO2paaar2QUFeDntfte', 'PEMIMPIN');
 
 INSERT INTO jabatan (nama_jabatan, gaji_pokok, tunjangan_default)
 VALUES

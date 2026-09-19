@@ -25,7 +25,7 @@ if (!$username || !$role || !$password) {
     exit;
 }
 
-if (!in_array($role, ['ADMIN', 'HR'], true)) {
+if (!in_array($role, ['ADMIN', 'HR', 'PEMIMPIN'], true)) {
     setFlashMessage('error', 'Role tidak valid.');
     header('Location: /?page=users/index');
     exit;

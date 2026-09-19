@@ -5,7 +5,7 @@ require_once dirname(__DIR__, 2) . '/includes/auth.php';
 
 requireAuth();
 $user = currentUser();
-if (!in_array($user['role'], ['ADMIN', 'FINANCE'], true)) {
+if (!in_array($user['role'], ['ADMIN', 'HR'], true)) {
     http_response_code(403);
     die('Akses ditolak.');
 }

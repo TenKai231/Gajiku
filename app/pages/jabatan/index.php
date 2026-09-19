@@ -6,7 +6,7 @@ require_once dirname(__DIR__, 2) . '/includes/jabatan.php';
 
 requireAuth();
 $user = currentUser();
-if ($user['role'] !== 'ADMIN') {
+if (!userHasRole('ADMIN')) {
     http_response_code(403);
     die('Akses ditolak.');
 }

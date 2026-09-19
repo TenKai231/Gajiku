@@ -84,6 +84,19 @@ $statusTransisi = [
         'Draft' => ['label' => 'Buka ke Draft', 'icon' => 'bi-unlock-fill', 'class' => 'btn-outline-secondary', 'confirm' => 'Kembalikan payroll ini ke Draft? Nominal tetap tersimpan tetapi dapat dihitung ulang.'],
     ],
 ];
+
+/**
+ * PEMIMPIN hanya melakukan APPROVAL (transisi maju):
+ *   Draft     → Processed (approve hasil hitungan)
+ *   Processed → Paid      (approve pembayaran)
+ * Pemimpin TIDAK bisa revert (Processed → Draft) dan tidak mengubah nominal payroll.
+ */
+if ($user['role'] === 'PEMIMPIN') {
+    $statusTransisi = [
+        'Draft'     => ['Processed' => ['label' => 'Approve (Processed)', 'icon' => 'bi-check2-circle', 'class' => 'btn-outline-primary', 'confirm' => 'Setujui payroll ini sebagai Processed? Payroll yang sudah Processed tidak dapat diubah bebas.']],
+        'Processed' => ['Paid'  => ['label' => 'Approve (Paid)', 'icon' => 'bi-check2-all', 'class' => 'btn-outline-success', 'confirm' => 'Setujui payroll ini sebagai Paid? Pastikan pembayaran sudah benar-benar dilakukan.']],
+    ];
+}
 ?>
 
 
@@ -169,7 +182,7 @@ $statusTransisi = [
                                             <i class="bi bi-pencil-square"></i> Ubah Draft
                                         </a>
                                     <?php endif; ?>
-                                    <?php if ($user['role'] === 'ADMIN' && isset($statusTransisi[$row['status']])): ?>
+                                    <?php if (in_array($user['role'], ['ADMIN', 'PEMIMPIN'], true) && isset($statusTransisi[$row['status']])): ?>
                                         <?php foreach ($statusTransisi[$row['status']] as $targetStatus => $btn): ?>
                                             <form action="/?action=payroll/change-status" method="POST" class="d-inline mt-1"
                                                   onsubmit="return confirm('<?= htmlspecialchars($btn['confirm'], ENT_QUOTES, 'UTF-8') ?>');">

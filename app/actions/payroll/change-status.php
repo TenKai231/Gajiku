@@ -7,7 +7,7 @@ require_once dirname(__DIR__, 2) . '/config/database.php';
 
 requireAuth();
 $user = currentUser();
-if ($user['role'] !== 'ADMIN') {
+if (!in_array($user['role'], ['ADMIN', 'PEMIMPIN'], true)) {
     http_response_code(403);
     exit('Akses ditolak.');
 }
@@ -32,6 +32,13 @@ if (!$payrollId) {
 $statusValid = ['Processed', 'Paid', 'Draft'];
 if (!in_array($statusBaru, $statusValid, true)) {
     $_SESSION['error'] = 'Status tujuan tidak valid.';
+    header('Location: /?page=payroll/index');
+    exit;
+}
+
+// PEMIMPIN hanya boleh APPROVE (transisi maju), tidak boleh revert ke Draft.
+if ($user['role'] === 'PEMIMPIN' && $statusBaru === 'Draft') {
+    $_SESSION['error'] = 'Pemimpin hanya dapat menyetujui payroll, tidak dapat mengembalikan ke Draft.';
     header('Location: /?page=payroll/index');
     exit;
 }

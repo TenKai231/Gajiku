@@ -100,3 +100,26 @@ function requireRole(string $role): void
         exit('Forbidden');
     }
 }
+
+/**
+ * Cek apakah user login memiliki salah satu dari role yang diberikan.
+ */
+function userHasRole(string ...$roles): bool
+{
+    $userRole = $_SESSION['user']['role'] ?? null;
+    return $userRole !== null && in_array($userRole, $roles, true);
+}
+
+/**
+ * Guard halaman/action: wajib login DAN memiliki salah satu role.
+ * Contoh: requireAnyRole('ADMIN', 'PEMIMPIN');
+ */
+function requireAnyRole(string ...$roles): void
+{
+    requireAuth();
+
+    if (!userHasRole(...$roles)) {
+        http_response_code(403);
+        exit('Forbidden');
+    }
+}

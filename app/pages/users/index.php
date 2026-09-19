@@ -50,7 +50,7 @@ $users = $stmt->fetchAll();
                                 <td class="px-4 py-3"><?= $index + 1 ?></td>
                                 <td class="px-4 py-3 fw-medium"><?= htmlspecialchars((string)$u['username'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td class="px-4 py-3">
-                                    <span class="badge <?= $u['role'] === 'ADMIN' ? 'bg-primary' : 'bg-info text-dark' ?>">
+                                    <span class="badge <?= $u['role'] === 'ADMIN' ? 'bg-primary' : ($u['role'] === 'PEMIMPIN' ? 'bg-warning text-dark' : 'bg-info text-dark') ?>">
                                         <?= htmlspecialchars((string)$u['role'], ENT_QUOTES, 'UTF-8') ?>
                                     </span>
                                 </td>
@@ -97,6 +97,7 @@ $users = $stmt->fetchAll();
                                                     <select class="form-select" name="role" required>
                                                         <option value="ADMIN" <?= $u['role'] === 'ADMIN' ? 'selected' : '' ?>>ADMIN</option>
                                                         <option value="HR" <?= $u['role'] === 'HR' ? 'selected' : '' ?>>HR</option>
+                                                        <option value="PEMIMPIN" <?= $u['role'] === 'PEMIMPIN' ? 'selected' : '' ?>>PEMIMPIN</option>
                                                     </select>
                                                 </div>
 
@@ -150,6 +151,7 @@ $users = $stmt->fetchAll();
                             <option value="">Pilih Role...</option>
                             <option value="ADMIN">ADMIN</option>
                             <option value="HR">HR</option>
+                            <option value="PEMIMPIN">PEMIMPIN</option>
                         </select>
                     </div>
 

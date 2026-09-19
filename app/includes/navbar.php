@@ -58,6 +58,12 @@ function is_active($currentPage, $targetPage) {
                     <i class="bi bi-people me-2"></i> Karyawan
                 </a>
             </li>
+            <?php elseif ($user['role'] === 'PEMIMPIN'): ?>
+            <li class="nav-item">
+                <a class="nav-link text-white <?= is_active($page, 'karyawan') ?>" href="/?page=karyawan/index">
+                    <i class="bi bi-people me-2"></i> Karyawan
+                </a>
+            </li>
             <?php endif; ?>
 
             <!-- SECTION: TRANSAKSI -->
@@ -65,7 +71,7 @@ function is_active($currentPage, $targetPage) {
                 <small class="text-white text-opacity-50 text-uppercase fw-bold ps-3" style="font-size: 0.75rem; letter-spacing: 1px;">Transaksi</small>
             </li>
 
-            <?php if (in_array($user['role'], ['ADMIN', 'HR'])): ?>
+            <?php if (in_array($user['role'], ['ADMIN', 'HR', 'PEMIMPIN'])): ?>
             <li class="nav-item">
                 <a class="nav-link text-white <?= is_active($page, 'absensi') ?>" href="/?page=absensi/index">
                     <i class="bi bi-calendar-check me-2"></i> Absensi
