@@ -71,8 +71,8 @@ unset($_SESSION['errors'], $_SESSION['form']);
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Karyawan</label>
-                            <input type="text" class="form-control" value="<?= htmlspecialchars($absensi['nip'] . ' - ' . $absensi['nama'], ENT_QUOTES, 'UTF-8') ?>" disabled>
+                            <label class="form-label">NIP Karyawan</label>
+                            <input type="text" class="form-control" value="<?= htmlspecialchars((string) $absensi['nip'], ENT_QUOTES, 'UTF-8') ?>" disabled>
                         </div>
                     </div>
 

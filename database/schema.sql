@@ -21,8 +21,9 @@ CREATE TABLE IF NOT EXISTS jabatan (
 
 CREATE TABLE IF NOT EXISTS golongan (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nama_golongan VARCHAR(50) NOT NULL,
+    nama_golongan VARCHAR(50) NOT NULL UNIQUE,
     uang_makan DECIMAL(15,2) NOT NULL DEFAULT 0,
+    tunjangan DECIMAL(15,2) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -117,6 +118,10 @@ CREATE TABLE IF NOT EXISTS penggajian (
     potongan_uang_makan DECIMAL(15,2) NOT NULL DEFAULT 0,
     gaji_kotor DECIMAL(15,2) NOT NULL,
     pph21 DECIMAL(15,2) NOT NULL DEFAULT 0,
+    potongan_bpjs DECIMAL(15,2) NOT NULL DEFAULT 0,
+    total_tanggungan_perusahaan DECIMAL(15,2) NOT NULL DEFAULT 0,
+    nama_jabatan_snapshot VARCHAR(100) NULL,
+    nama_golongan_snapshot VARCHAR(50) NULL,
     status_ptkp_snapshot VARCHAR(10) NULL,
     kategori_ter_snapshot CHAR(1) NULL,
     potongan_lain DECIMAL(15,2) NOT NULL DEFAULT 0,

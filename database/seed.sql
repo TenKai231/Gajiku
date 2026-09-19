@@ -16,11 +16,11 @@ VALUES
     ('Staff HR', 7000000.00, 1000000.00),
     ('Staff Administrasi', 5500000.00, 750000.00);
 
-INSERT INTO golongan (nama_golongan, uang_makan)
+INSERT INTO golongan (nama_golongan, uang_makan, tunjangan)
 VALUES
-    ('Golongan I', 50000.00),
-    ('Golongan II', 75000.00),
-    ('Golongan III', 100000.00);
+    ('Golongan I', 50000.00, 750000.00),
+    ('Golongan II', 75000.00, 1000000.00),
+    ('Golongan III', 100000.00, 2000000.00);
 
 INSERT INTO karyawan (nip, nama, jenis_kelamin, tanggal_lahir, tanggal_masuk, jabatan_id, golongan_id, status)
 VALUES

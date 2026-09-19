@@ -19,6 +19,21 @@ function fetchAbsensiByPeriode(PDO $pdo, int $bulan, int $tahun): array
     return $stmt->fetchAll();
 }
 
+function fetchAbsensiKaryawanByPeriode(PDO $pdo, int $karyawanId, int $bulan, int $tahun): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT * FROM absensi
+         WHERE karyawan_id = :karyawan_id AND MONTH(tanggal) = :bulan AND YEAR(tanggal) = :tahun
+         ORDER BY tanggal ASC'
+    );
+    $stmt->execute([
+        ':karyawan_id' => $karyawanId,
+        ':bulan' => $bulan,
+        ':tahun' => $tahun,
+    ]);
+    return $stmt->fetchAll();
+}
+
 function fetchAbsensiById(PDO $pdo, int $id): ?array
 {
     $stmt = $pdo->prepare(

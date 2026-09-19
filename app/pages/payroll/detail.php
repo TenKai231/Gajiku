@@ -17,10 +17,11 @@ require_once dirname(__DIR__, 2) . '/config/database.php';
 $pdo = getPDO();
 
 $stmt = $pdo->prepare(
-    'SELECT p.*, k.nama, k.nip, j.nama_jabatan
+    'SELECT p.*, k.nama, k.nip, j.nama_jabatan, g.nama_golongan
      FROM penggajian p
      JOIN karyawan k ON p.karyawan_id = k.id
-     JOIN jabatan j ON k.jabatan_id = j.id
+     LEFT JOIN jabatan j ON k.jabatan_id = j.id
+     LEFT JOIN golongan g ON k.golongan_id = g.id
      WHERE p.id = :id LIMIT 1'
 );
 $stmt->execute([':id' => $id]);
@@ -79,13 +80,18 @@ $strPeriode = $namaBulan . ' ' . $t;
                 <span class="badge <?= $slip['status'] === 'Draft' ? 'bg-warning text-dark' : ($slip['status'] === 'Paid' ? 'bg-success' : ($slip['status'] === 'Corrected' ? 'bg-secondary' : 'bg-info text-dark')) ?> mt-2"><?= htmlspecialchars($slip['status'], ENT_QUOTES, 'UTF-8') ?> · Revisi <?= (int) $slip['revisi'] ?></span>
             </div>
 
+            <?php
+            $jabatanDisplay = $slip['nama_jabatan_snapshot'] ?: ($slip['nama_jabatan'] ?? '-');
+            $golonganDisplay = $slip['nama_golongan_snapshot'] ?: ($slip['nama_golongan'] ?? '-');
+            ?>
             <div class="row mb-4">
                 <div class="col-6">
                     <p class="mb-1"><strong>NIP:</strong> <?= htmlspecialchars((string)$slip['nip'], ENT_QUOTES, 'UTF-8') ?></p>
-                    <p class="mb-0"><strong>Nama:</strong> <?= htmlspecialchars((string)$slip['nama'], ENT_QUOTES, 'UTF-8') ?></p>
+                    <p class="mb-1"><strong>Nama:</strong> <?= htmlspecialchars((string)$slip['nama'], ENT_QUOTES, 'UTF-8') ?></p>
+                    <p class="mb-0"><strong>Golongan:</strong> <?= htmlspecialchars((string)$golonganDisplay, ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div class="col-6 text-end">
-                    <p class="mb-1"><strong>Jabatan:</strong> <?= htmlspecialchars((string)$slip['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?></p>
+                    <p class="mb-1"><strong>Jabatan:</strong> <?= htmlspecialchars((string)$jabatanDisplay, ENT_QUOTES, 'UTF-8') ?></p>
                     <p class="mb-0"><strong>Periode:</strong> <?= $strPeriode ?></p>
                 </div>
             </div>

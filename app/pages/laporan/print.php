@@ -110,6 +110,8 @@ foreach ($dataPayroll as $row) {
                 <th style="width:40px;">No</th>
                 <th>NIP</th>
                 <th>Nama Karyawan</th>
+                <th>Jabatan</th>
+                <th>Golongan</th>
                 <th>Gaji Pokok</th>
                 <th>Tunjangan</th>
                 <th>Potongan</th>
@@ -123,6 +125,8 @@ foreach ($dataPayroll as $row) {
                         <td class="text-center"><?= $no++ ?></td>
                         <td class="text-center"><?= htmlspecialchars((string)$row['nip'], ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars((string)$row['nama'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars((string)($row['nama_jabatan'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
+                        <td class="text-center"><?= htmlspecialchars((string)($row['nama_golongan'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td>
                         <td class="text-end"><?= formatCurrency((float)$row['gaji_pokok']) ?></td>
                         <td class="text-end"><?= formatCurrency((float)$row['total_tunjangan']) ?></td>
                         <td class="text-end text-danger"><?= formatCurrency((float)$row['total_potongan']) ?></td>
@@ -131,14 +135,14 @@ foreach ($dataPayroll as $row) {
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="7" class="text-center" style="padding: 24px;">Tidak ada data penggajian untuk periode ini.</td>
+                    <td colspan="9" class="text-center" style="padding: 24px;">Tidak ada data penggajian untuk periode ini.</td>
                 </tr>
             <?php endif; ?>
         </tbody>
         <?php if (count($dataPayroll) > 0): ?>
         <tfoot>
             <tr>
-                <td colspan="3" class="text-end">TOTAL KESELURUHAN</td>
+                <td colspan="5" class="text-end">TOTAL KESELURUHAN</td>
                 <td class="text-end"><?= formatCurrency($totalGajiPokok) ?></td>
                 <td class="text-end"><?= formatCurrency($totalTunjangan) ?></td>
                 <td class="text-end text-danger"><?= formatCurrency($totalPotongan) ?></td>

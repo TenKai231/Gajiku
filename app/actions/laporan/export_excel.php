@@ -39,7 +39,7 @@ echo "Kantor Jaya Bersama\n";
 echo "Periode: " . $strPeriode . "\n\n";
 
 // Headers
-echo "No" . $separator . "NIP" . $separator . "Nama Karyawan" . $separator . "Gaji Pokok" . $separator . "Tunjangan" . $separator . "Potongan" . $separator . "Gaji Bersih" . "\n";
+echo "No" . $separator . "NIP" . $separator . "Nama Karyawan" . $separator . "Jabatan" . $separator . "Golongan" . $separator . "Gaji Pokok" . $separator . "Tunjangan" . $separator . "Potongan" . $separator . "Gaji Bersih" . "\n";
 
 $no = 1;
 $totalGajiPokok = 0;
@@ -51,6 +51,8 @@ foreach ($dataPayroll as $data) {
     echo $no++ . $separator;
     echo $data['nip'] . $separator;
     echo $data['nama'] . $separator;
+    echo ($data['nama_jabatan'] ?? '-') . $separator;
+    echo ($data['nama_golongan'] ?? '-') . $separator;
     echo (float) $data['gaji_pokok'] . $separator;
     echo (float) $data['total_tunjangan'] . $separator;
     echo (float) $data['total_potongan'] . $separator;
@@ -63,7 +65,7 @@ foreach ($dataPayroll as $data) {
 }
 
 // Totals
-echo "TOTAL KESELURUHAN" . $separator . "" . $separator . "" . $separator;
+echo "TOTAL KESELURUHAN" . $separator . "" . $separator . "" . $separator . "" . $separator . "" . $separator;
 echo $totalGajiPokok . $separator;
 echo $totalTunjangan . $separator;
 echo $totalPotongan . $separator;

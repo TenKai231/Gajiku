@@ -60,7 +60,7 @@ try {
 
     if ($modeKoreksi) {
         $stmtKaryawan = $pdo->prepare(
-            "SELECT k.*, j.gaji_pokok, j.tunjangan_default, g.uang_makan
+            "SELECT k.*, j.gaji_pokok, g.tunjangan, g.tunjangan AS tunjangan_default, g.uang_makan
              FROM penggajian p
              JOIN karyawan k ON p.karyawan_id = k.id
              JOIN jabatan j ON k.jabatan_id = j.id
@@ -77,7 +77,7 @@ try {
     if (!$modeKoreksi) {
         // 2. Ambil Karyawan Aktif untuk payroll baru atau hitung ulang Draft.
         $stmtKaryawan = $pdo->query(
-            "SELECT k.*, j.gaji_pokok, j.tunjangan_default, g.uang_makan
+            "SELECT k.*, j.gaji_pokok, g.tunjangan, g.tunjangan AS tunjangan_default, g.uang_makan
              FROM karyawan k
              JOIN jabatan j ON k.jabatan_id = j.id
              JOIN golongan g ON k.golongan_id = g.id
@@ -122,7 +122,8 @@ try {
 
         // 4. Hitung menggunakan Payroll Engine
         // Kita hitung dulu Gross Income-nya secara sederhana di sini untuk mencari TER Rate
-        $estimasiGross = $karyawan['gaji_pokok'] + $karyawan['tunjangan_default'];
+        $tunjanganKaryawan = (float) ($karyawan['tunjangan'] ?? $karyawan['tunjangan_default'] ?? 0);
+        $estimasiGross = (float) $karyawan['gaji_pokok'] + $tunjanganKaryawan;
 
         // Hitung total hadir sementara untuk uang makan
         $totalHadir = 0;

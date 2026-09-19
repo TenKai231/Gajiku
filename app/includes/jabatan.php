@@ -5,9 +5,11 @@ declare(strict_types=1);
 function fetchAllJabatan(PDO $pdo): array
 {
     $stmt = $pdo->query(
-        'SELECT id, nama_jabatan, gaji_pokok, tunjangan_default
-         FROM jabatan
-         ORDER BY id ASC'
+        'SELECT j.*, COUNT(k.id) AS jumlah_karyawan
+         FROM jabatan j
+         LEFT JOIN karyawan k ON j.id = k.jabatan_id
+         GROUP BY j.id
+         ORDER BY j.id ASC'
     );
 
     return $stmt->fetchAll();
@@ -31,7 +33,7 @@ function jabatanNameExists(PDO $pdo, string $namaJabatan, ?int $excludeId = null
 {
     $sql = 'SELECT id
             FROM jabatan
-            WHERE nama_jabatan = :nama_jabatan';
+            WHERE LOWER(nama_jabatan) = LOWER(:nama_jabatan)';
     $params = [':nama_jabatan' => $namaJabatan];
 
     if ($excludeId !== null) {
@@ -47,12 +49,12 @@ function jabatanNameExists(PDO $pdo, string $namaJabatan, ?int $excludeId = null
     return $stmt->fetch() !== false;
 }
 
-function validateJabatanInput(array $input): array
+function validateJabatanInput(array $input, array $existingData = []): array
 {
     $form = [
         'nama_jabatan' => trim((string) ($input['nama_jabatan'] ?? '')),
-        'gaji_pokok' => trim((string) ($input['gaji_pokok'] ?? '')),
-        'tunjangan_default' => trim((string) ($input['tunjangan_default'] ?? '')),
+        'gaji_pokok' => trim((string) ($input['gaji_pokok'] ?? ($existingData['gaji_pokok'] ?? '0'))),
+        'tunjangan_default' => trim((string) ($input['tunjangan_default'] ?? ($existingData['tunjangan_default'] ?? '0'))),
     ];
 
     $errors = [];
@@ -63,14 +65,14 @@ function validateJabatanInput(array $input): array
         $errors['nama_jabatan'] = 'Nama jabatan maksimal 100 karakter.';
     }
 
-    $gajiPokok = normalizeJabatanAmount($form['gaji_pokok']);
+    $gajiPokok = normalizeJabatanAmount($form['gaji_pokok'] !== '' ? $form['gaji_pokok'] : '0');
     if ($gajiPokok === null) {
         $errors['gaji_pokok'] = 'Gaji pokok harus berupa angka.';
     } elseif ($gajiPokok < 0) {
         $errors['gaji_pokok'] = 'Gaji pokok tidak boleh negatif.';
     }
 
-    $tunjanganDefault = normalizeJabatanAmount($form['tunjangan_default']);
+    $tunjanganDefault = normalizeJabatanAmount($form['tunjangan_default'] !== '' ? $form['tunjangan_default'] : '0');
     if ($tunjanganDefault === null) {
         $errors['tunjangan_default'] = 'Tunjangan harus berupa angka.';
     } elseif ($tunjanganDefault < 0) {
@@ -82,8 +84,8 @@ function validateJabatanInput(array $input): array
         'form' => $form,
         'data' => [
             'nama_jabatan' => $form['nama_jabatan'],
-            'gaji_pokok' => $gajiPokok,
-            'tunjangan_default' => $tunjanganDefault,
+            'gaji_pokok' => $gajiPokok ?? 0.0,
+            'tunjangan_default' => $tunjanganDefault ?? 0.0,
         ],
     ];
 }

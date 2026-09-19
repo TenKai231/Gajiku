@@ -48,7 +48,8 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <tr>
                         <th class="px-4 py-3">No</th>
                         <th class="px-4 py-3">Nama Golongan</th>
-                        <th class="px-4 py-3 text-end">Uang Makan</th>
+                        <th class="px-4 py-3 text-end">Uang Makan / Hari</th>
+                        <th class="px-4 py-3 text-end">Tunjangan Golongan</th>
                         <th class="px-4 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -57,8 +58,11 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <?php foreach ($golongans as $index => $golongan): ?>
                             <tr>
                                 <td class="px-4 py-3"><?= $index + 1 ?></td>
-                                <td class="px-4 py-3 fw-medium"><?= htmlspecialchars((string) $golongan['nama_golongan'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td class="px-4 py-3 fw-medium">
+                                    <span class="badge bg-secondary me-1"><?= htmlspecialchars((string) $golongan['nama_golongan'], ENT_QUOTES, 'UTF-8') ?></span>
+                                </td>
                                 <td class="px-4 py-3 text-end">Rp <?= number_format((float) $golongan['uang_makan'], 0, ',', '.') ?></td>
+                                <td class="px-4 py-3 text-end fw-semibold text-success">Rp <?= number_format((float) ($golongan['tunjangan'] ?? 0), 0, ',', '.') ?></td>
                                 <td class="px-4 py-3 text-center">
                                     <a href="/?page=golongan/edit&id=<?= $golongan['id'] ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Edit
@@ -74,7 +78,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" class="text-center py-4 text-secondary">
+                            <td colspan="5" class="text-center py-4 text-secondary">
                                 Belum ada data golongan.
                             </td>
                         </tr>

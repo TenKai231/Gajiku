@@ -11,9 +11,8 @@ $user = currentUser();
 
 require_once dirname(__DIR__, 2) . '/config/database.php';
 $pdo = getPDO();
-$pdo = getPDO();
 
-$search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
+$search = trim((string) ($_GET['search'] ?? ''));
 
 // Manual logic fetch since we have a search param
 $sql = 'SELECT k.*, j.nama_jabatan, g.nama_golongan
@@ -23,8 +22,9 @@ $sql = 'SELECT k.*, j.nama_jabatan, g.nama_golongan
 $params = [];
 
 if ($search !== '') {
-    $sql .= ' WHERE k.nama LIKE :search OR k.nip LIKE :search';
-    $params[':search'] = "%$search%";
+    $sql .= ' WHERE (k.nama LIKE :search_nama OR k.nip LIKE :search_nip)';
+    $params[':search_nama'] = "%$search%";
+    $params[':search_nip'] = "%$search%";
 }
 
 $sql .= ' ORDER BY k.nip ASC';

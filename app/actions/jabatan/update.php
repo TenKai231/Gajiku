@@ -36,11 +36,11 @@ if (!$jabatan) {
 
 $input = [
     'nama_jabatan' => $_POST['nama_jabatan'] ?? '',
-    'gaji_pokok' => $_POST['gaji_pokok'] ?? '',
-    'tunjangan_default' => $_POST['tunjangan_default'] ?? '',
+    'gaji_pokok' => $_POST['gaji_pokok'] ?? $jabatan['gaji_pokok'],
+    'tunjangan_default' => $_POST['tunjangan_default'] ?? $jabatan['tunjangan_default'],
 ];
 
-$validation = validateJabatanInput($input);
+$validation = validateJabatanInput($input, $jabatan);
 $errors = $validation['errors'];
 $form = $validation['form'];
 $data = $validation['data'];

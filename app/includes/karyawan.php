@@ -15,9 +15,10 @@ function fetchAllKaryawan(PDO $pdo): array
 function fetchKaryawanById(PDO $pdo, int $id): ?array
 {
     $stmt = $pdo->prepare(
-        'SELECT k.*, j.nama_jabatan, j.gaji_pokok, j.tunjangan_default
+        'SELECT k.*, j.nama_jabatan, j.gaji_pokok, j.tunjangan_default, g.nama_golongan, g.uang_makan, g.tunjangan
          FROM karyawan k
          LEFT JOIN jabatan j ON k.jabatan_id = j.id
+         LEFT JOIN golongan g ON k.golongan_id = g.id
          WHERE k.id = :id
          LIMIT 1'
     );

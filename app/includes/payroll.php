@@ -7,10 +7,13 @@ function fetchPenggajianByPeriode(PDO $pdo, string $periode, ?string $status = n
 {
     // $periode format: "MM-YYYY" misalnya "08-2026"
     $sql =
-        'SELECT p.*, k.nama, k.nip, j.nama_jabatan
+        'SELECT p.*, k.nama, k.nip,
+                COALESCE(p.nama_jabatan_snapshot, j.nama_jabatan) AS nama_jabatan,
+                COALESCE(p.nama_golongan_snapshot, g.nama_golongan) AS nama_golongan
          FROM penggajian p
          JOIN karyawan k ON p.karyawan_id = k.id
-         JOIN jabatan j ON k.jabatan_id = j.id
+         LEFT JOIN jabatan j ON k.jabatan_id = j.id
+         LEFT JOIN golongan g ON k.golongan_id = g.id
          WHERE p.periode = :periode';
     $params = [':periode' => $periode];
 
@@ -20,8 +23,9 @@ function fetchPenggajianByPeriode(PDO $pdo, string $periode, ?string $status = n
     }
 
     if ($search !== null && $search !== '') {
-        $sql .= ' AND (k.nama LIKE :search OR k.nip LIKE :search)';
-        $params[':search'] = '%' . $search . '%';
+        $sql .= ' AND (k.nama LIKE :search_nama OR k.nip LIKE :search_nip)';
+        $params[':search_nama'] = '%' . $search . '%';
+        $params[':search_nip'] = '%' . $search . '%';
     }
 
     $stmt = $pdo->prepare($sql . ' ORDER BY k.nama ASC');
@@ -37,10 +41,13 @@ function fetchPenggajianByPeriode(PDO $pdo, string $periode, ?string $status = n
 function fetchPenggajianRekapByPeriode(PDO $pdo, string $periode): array
 {
     $stmt = $pdo->prepare(
-        "SELECT p.*, k.nama, k.nip, j.nama_jabatan
+        "SELECT p.*, k.nama, k.nip,
+                COALESCE(p.nama_jabatan_snapshot, j.nama_jabatan) AS nama_jabatan,
+                COALESCE(p.nama_golongan_snapshot, g.nama_golongan) AS nama_golongan
          FROM penggajian p
          JOIN karyawan k ON p.karyawan_id = k.id
-         JOIN jabatan j ON k.jabatan_id = j.id
+         LEFT JOIN jabatan j ON k.jabatan_id = j.id
+         LEFT JOIN golongan g ON k.golongan_id = g.id
          WHERE p.periode = :periode
            AND p.status <> 'Corrected'
            AND p.revisi = (
@@ -297,7 +304,7 @@ function kalkulasiGajiKaryawan(PDO $pdo, array $karyawan, array $absensiBulanIni
 {
     // 1. Ambil data dasar (jabatan)
     $gajiPokok = (float) $karyawan['gaji_pokok'];
-    $tunjanganDefault = (float) $karyawan['tunjangan_default'];
+    $tunjanganDefault = (float) (isset($karyawan['tunjangan']) ? $karyawan['tunjangan'] : ($karyawan['tunjangan_default'] ?? 0));
     $uangMakanUtuh = (float) ($karyawan['uang_makan'] ?? 0);
 
     // 2. Analisis data absen
@@ -350,36 +357,35 @@ function kalkulasiGajiKaryawan(PDO $pdo, array $karyawan, array $absensiBulanIni
         $tunjanganDefault = ($tunjanganDefault / 30) * $hariAktifKerja;
     }
 
-    // 4. Hitung Potongan
-    // Potongan Alpha = n hari * (Gaji Pokok Awal / 30) * rules (1 hari)
+    // 4. Hitung Potongan Gaji Pokok (Absensi: Alpha & Sakit)
+    // Sesuai Rancangan 2.0 & fix-requirements:
+    // Terlambat (> 08:00) HANYA MEMOTONG UANG MAKAN, TIDAK MEMOTONG GAJI POKOK.
     $potonganAlpha = $totalAlpha * $gajiPerHari * $rules['deductions']['alpha'];
-
-    // Potongan Sakit = n hari * (Gaji Pokok Awal / 30) * rules (0.5 hari)
     $potonganSakit = $totalSakit * $gajiPerHari * $rules['deductions']['sakit'];
-
-    // Potongan Terlambat
-    $potonganTerlambat = $totalTerlambat * $rules['deductions']['late_per_occurrence'];
-
-    $totalPotongan = $potonganAlpha + $potonganSakit + $potonganTerlambat;
+    $potonganLain = $potonganAlpha + $potonganSakit; // Potongan gaji pokok hanya dari alpha & sakit
     $totalTunjangan = $tunjanganDefault;
 
-    // 5. Hitung Gaji Kotor & Bersih
-    $potonganLain = $potonganAlpha + $potonganSakit;
-    
-    // 4.5 Hitung Uang Makan (Hanya diberikan sesuai kehadiran nyata, dipotong jika terlambat)
+    // 5. Hitung Uang Makan
+    // Hak uang makan = Hari Hadir × Uang Makan / Hari
+    // Keterlambatan memotong jatah uang makan hari bersangkutan: Hari Terlambat × Uang Makan / Hari
     $totalUangMakan = $totalHadir * $uangMakanUtuh;
-    $potonganUangMakan = $totalTerlambat * $rules['deductions']['late_per_occurrence'];
-    if ($potonganUangMakan > $totalUangMakan) {
-        $potonganUangMakan = $totalUangMakan; // Jangan sampai minus uang makan
-    }
+    $potonganUangMakan = min($totalUangMakan, $totalTerlambat * $uangMakanUtuh);
+    $uangMakanNeto = $totalUangMakan - $potonganUangMakan;
 
+    // Gaji Kotor (Total Penghasilan Bruto)
     $gajiKotor = $gajiPokok + $totalTunjangan + $totalUangMakan;
-    // Hitung BPJS
+
+    // 6. Hitung BPJS (dasar upah: Gaji Pokok + Tunjangan Tetap)
     $processDate = sprintf('%04d-%02d-01', explode('-', $periode)[1], explode('-', $periode)[0]);
     $bpjs = calculateBpjs($pdo, (int)$karyawan['id'], $gajiPokok, $totalTunjangan, $processDate);
 
+    // 7. Hitung PPh 21
+    // Pemisahan tegas: PPh 21 adalah kewajiban pajak resmi via Tax Engine (TER Bulanan PP 58/2023),
+    // BUKAN potongan internal 5% atas uang makan.
     $pph21 = $gajiKotor * $terRate;
-    $totalPotongan = $potonganLain + $bpjs['total_deduction'] + $pph21 + $potonganUangMakan;
+
+    // Total Potongan Karyawan (Pengurang Penghasilan Bruto)
+    $totalPotongan = $potonganLain + $potonganUangMakan + $bpjs['total_deduction'] + $pph21;
     $gajiBersih = $gajiKotor - $totalPotongan;
 
     return [
@@ -398,6 +404,8 @@ function kalkulasiGajiKaryawan(PDO $pdo, array $karyawan, array $absensiBulanIni
         'bpjs_detail' => $bpjs ?? [],
         'status_ptkp_snapshot' => $taxProfile ? $taxProfile['status_ptkp'] : null,
         'kategori_ter_snapshot' => $taxProfile ? $taxProfile['kategori_ter'] : null,
+        'nama_jabatan_snapshot' => $karyawan['nama_jabatan'] ?? null,
+        'nama_golongan_snapshot' => $karyawan['nama_golongan'] ?? null,
         'gaji_bersih' => $gajiBersih,
         // Meta data untuk slip gaji
         '_meta' => [
@@ -407,7 +415,9 @@ function kalkulasiGajiKaryawan(PDO $pdo, array $karyawan, array $absensiBulanIni
             'total_terlambat' => $totalTerlambat,
             'potongan_alpha' => $potonganAlpha,
             'potongan_sakit' => $potonganSakit,
-            'potongan_terlambat' => $potonganTerlambat,
+            'potongan_terlambat' => $potonganUangMakan,
+            'potongan_uang_makan' => $potonganUangMakan,
+            'uang_makan_neto' => $uangMakanNeto,
             'is_prorata' => $isProrata
         ]
     ];
@@ -423,11 +433,11 @@ function simpanPenggajian(PDO $pdo, array $payrollData, string $status = 'Draft'
         "INSERT INTO penggajian (
             karyawan_id, periode, revisi, koreksi_dari_id, gaji_pokok, total_tunjangan, gaji_kotor,
             total_uang_makan, potongan_uang_makan,
-            potongan_lain, potongan_bpjs, total_tanggungan_perusahaan, total_potongan, gaji_bersih, tanggal_proses, status, pph21, status_ptkp_snapshot, kategori_ter_snapshot, diproses_oleh
+            potongan_lain, potongan_bpjs, total_tanggungan_perusahaan, total_potongan, gaji_bersih, tanggal_proses, status, pph21, status_ptkp_snapshot, kategori_ter_snapshot, nama_jabatan_snapshot, nama_golongan_snapshot, diproses_oleh
          ) VALUES (
             :karyawan_id, :periode, :revisi, :koreksi_dari_id, :gaji_pokok, :total_tunjangan, :gaji_kotor,
             :total_uang_makan, :potongan_uang_makan,
-            :potongan_lain, :potongan_bpjs, :total_tanggungan_perusahaan, :total_potongan, :gaji_bersih, :tanggal_proses, :status, :pph21, :status_ptkp_snapshot, :kategori_ter_snapshot, :diproses_oleh
+            :potongan_lain, :potongan_bpjs, :total_tanggungan_perusahaan, :total_potongan, :gaji_bersih, :tanggal_proses, :status, :pph21, :status_ptkp_snapshot, :kategori_ter_snapshot, :nama_jabatan_snapshot, :nama_golongan_snapshot, :diproses_oleh
          )"
     );
 
@@ -451,6 +461,8 @@ function simpanPenggajian(PDO $pdo, array $payrollData, string $status = 'Draft'
         ':pph21' => $payrollData['pph21'],
         ':status_ptkp_snapshot' => $payrollData['status_ptkp_snapshot'],
         ':kategori_ter_snapshot' => $payrollData['kategori_ter_snapshot'],
+        ':nama_jabatan_snapshot' => $payrollData['nama_jabatan_snapshot'] ?? null,
+        ':nama_golongan_snapshot' => $payrollData['nama_golongan_snapshot'] ?? null,
         ':diproses_oleh' => $diprosesOleh
     ]);
 

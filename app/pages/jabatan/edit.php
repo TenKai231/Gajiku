@@ -13,7 +13,7 @@ if ($user['role'] !== 'ADMIN') {
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id) {
-    header('Location: /?page=jabatan');
+    header('Location: /?page=jabatan/index');
     exit;
 }
 
@@ -23,101 +23,62 @@ $jabatan = fetchJabatanById($pdo, $id);
 
 if (!$jabatan) {
     $_SESSION['error'] = 'Jabatan tidak ditemukan.';
-    header('Location: /?page=jabatan');
+    header('Location: /?page=jabatan/index');
     exit;
 }
 
-// Ambil error / form data lama dari session (jika ada error validasi saat submit)
 $errors = $_SESSION['errors'] ?? [];
-// Jika ada old input di session, gunakan itu. Jika tidak, gunakan dari db.
 $form = $_SESSION['form'] ?? [
     'nama_jabatan' => $jabatan['nama_jabatan'],
-    'gaji_pokok' => $jabatan['gaji_pokok'],
-    'tunjangan_default' => $jabatan['tunjangan_default']
 ];
 unset($_SESSION['errors'], $_SESSION['form']);
 ?>
-<!doctype html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Jabatan — Sistem Informasi Penggajian</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/index.php">Gajiku</a>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Edit Jabatan</h1>
+            <a href="/?page=jabatan/index" class="btn btn-outline-secondary">Kembali</a>
         </div>
-    </nav>
 
-    <main class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="h3 mb-0">Edit Jabatan</h1>
-                    <a href="/?page=jabatan" class="btn btn-outline-secondary">Kembali</a>
-                </div>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
 
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <form action="/?action=jabatan/update" method="POST">
-                            <input type="hidden" name="id" value="<?= htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8') ?>">
-
-                            <div class="mb-3">
-                                <label for="nama_jabatan" class="form-label">Nama Jabatan</label>
-                                <input type="text"
-                                       class="form-control <?= isset($errors['nama_jabatan']) ? 'is-invalid' : '' ?>"
-                                       id="nama_jabatan"
-                                       name="nama_jabatan"
-                                       value="<?= htmlspecialchars((string) $form['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?>"
-                                       required>
-                                <?php if (isset($errors['nama_jabatan'])): ?>
-                                    <div class="invalid-feedback"><?= htmlspecialchars($errors['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?></div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="gaji_pokok" class="form-label">Gaji Pokok</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number"
-                                           class="form-control <?= isset($errors['gaji_pokok']) ? 'is-invalid' : '' ?>"
-                                           id="gaji_pokok"
-                                           name="gaji_pokok"
-                                           value="<?= htmlspecialchars((string) $form['gaji_pokok'], ENT_QUOTES, 'UTF-8') ?>"
-                                           min="0" step="1" required>
-                                </div>
-                                <?php if (isset($errors['gaji_pokok'])): ?>
-                                    <div class="small text-danger mt-1"><?= htmlspecialchars($errors['gaji_pokok'], ENT_QUOTES, 'UTF-8') ?></div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="tunjangan_default" class="form-label">Tunjangan Default</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number"
-                                           class="form-control <?= isset($errors['tunjangan_default']) ? 'is-invalid' : '' ?>"
-                                           id="tunjangan_default"
-                                           name="tunjangan_default"
-                                           value="<?= htmlspecialchars((string) $form['tunjangan_default'], ENT_QUOTES, 'UTF-8') ?>"
-                                           min="0" step="1" required>
-                                </div>
-                                <?php if (isset($errors['tunjangan_default'])): ?>
-                                    <div class="small text-danger mt-1"><?= htmlspecialchars($errors['tunjangan_default'], ENT_QUOTES, 'UTF-8') ?></div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-primary">Update Jabatan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+            <div>
+                <strong>Struktur Kompensasi:</strong> Gaji Pokok, Uang Makan, dan Tunjangan ditentukan berdasarkan <strong>Golongan</strong> pada menu <a href="/?page=golongan/index" class="alert-link">Kelola Golongan</a>. Jabatan hanya mengatur posisi/titel pekerjaan.
             </div>
         </div>
-    </main>
-</body>
-</html>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form action="/?action=jabatan/update" method="POST">
+                    <input type="hidden" name="id" value="<?= htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8') ?>">
+
+                    <div class="mb-4">
+                        <label for="nama_jabatan" class="form-label fw-semibold">Nama Jabatan <span class="text-danger">*</span></label>
+                        <input type="text"
+                               class="form-control <?= isset($errors['nama_jabatan']) ? 'is-invalid' : '' ?>"
+                               id="nama_jabatan"
+                               name="nama_jabatan"
+                               value="<?= htmlspecialchars((string) $form['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?>"
+                               required
+                               placeholder="Contoh: Staff IT, Manager, HR Specialist">
+                        <?php if (isset($errors['nama_jabatan'])): ?>
+                            <div class="invalid-feedback"><?= htmlspecialchars($errors['nama_jabatan'], ENT_QUOTES, 'UTF-8') ?></div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Update Jabatan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

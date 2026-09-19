@@ -13,7 +13,7 @@ if (!in_array($user['role'], ['ADMIN', 'HR'], true)) {
 require_once dirname(__DIR__, 2) . '/config/database.php';
 $pdo = getPDO();
 // Ambil karyawan aktif saja untuk diabsen
-$stmt = $pdo->query("SELECT id, nip, nama FROM karyawan WHERE status = 'Aktif' ORDER BY nama ASC");
+$stmt = $pdo->query("SELECT id, nip FROM karyawan WHERE status = 'Aktif' ORDER BY nip ASC");
 $karyawans = $stmt->fetchAll();
 
 $errors = $_SESSION['errors'] ?? [];
@@ -52,13 +52,13 @@ unset($_SESSION['errors'], $_SESSION['form']);
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="karyawan_id" class="form-label">Karyawan</label>
+                            <label for="karyawan_id" class="form-label">NIP Karyawan</label>
                             <select class="form-select <?= isset($errors['karyawan_id']) ? 'is-invalid' : '' ?>"
                                     id="karyawan_id" name="karyawan_id" required>
-                                <option value="">-- Pilih Karyawan --</option>
+                                <option value="">-- Pilih NIP Karyawan --</option>
                                 <?php foreach ($karyawans as $k): ?>
                                     <option value="<?= $k['id'] ?>" <?= ((string) $form['karyawan_id'] === (string) $k['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($k['nip'] . ' - ' . $k['nama'], ENT_QUOTES, 'UTF-8') ?>
+                                        <?= htmlspecialchars((string) $k['nip'], ENT_QUOTES, 'UTF-8') ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
