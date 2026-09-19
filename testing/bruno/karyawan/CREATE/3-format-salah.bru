@@ -5,19 +5,22 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/karyawan.php?action=create
+  url: http://localhost:8080/?action=karyawan/store
   body: formUrlEncoded
   auth: none
 }
 
 body:form-urlencoded {
   nip: EMP-002
-  nama_lengkap: Siti Aminah
-  email: bukan-format-email
+  nama: Siti Aminah
   jabatan_id: abc
   tanggal_masuk: 2026-15-40
   status: Aktif
+  jenis_kelamin: L
+  tanggal_lahir: 1990-01-01
+  golongan_id: 1
 }
+
 
 tests {
   test("Validasi format menolak email/tanggal/jabatan yang salah", function() {

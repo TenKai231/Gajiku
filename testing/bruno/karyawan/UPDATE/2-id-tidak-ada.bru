@@ -5,14 +5,15 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/karyawan.php?action=edit&id=99999
+  url: http://localhost:8080/?action=karyawan/update&id=99999
   body: formUrlEncoded
   auth: none
 }
 
 body:form-urlencoded {
-  nama_lengkap: Ghost
+  nama: Ghost
 }
+
 
 tests {
   test("Update menolak modifikasi ID yang tidak eksis", function() {

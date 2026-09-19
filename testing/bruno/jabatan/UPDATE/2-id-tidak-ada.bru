@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/jabatan.php?action=edit&id=99999
+  url: http://localhost:8080/?action=jabatan/update&id=99999
   body: formUrlEncoded
   auth: none
 }
@@ -13,8 +13,9 @@ post {
 body:form-urlencoded {
   nama_jabatan: Ghost
   gaji_pokok: 1000
-  tunjangan: 0
+  tunjangan_default: 0
 }
+
 
 tests {
   test("Update menolak modifikasi ID yang tidak eksis", function() {

@@ -4,17 +4,19 @@ meta {
   seq: 1
 }
 post {
-  url: http://localhost:8080/absensi.php?action=create
+  url: http://localhost:8080/?action=absensi/store
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
   karyawan_id: 1
   tanggal: 2026-08-31
-  status_absensi: Hadir
+  status: Hadir
   jam_masuk: 07:45
-  jam_keluar: 17:00
+  jam_pulang: 17:00
+  keterangan: 
 }
+
 tests {
   test("Redirect / sukses (200/302)", function() {
     expect(res.getStatus()).to.be.oneOf([200, 302]);

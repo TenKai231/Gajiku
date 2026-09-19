@@ -4,14 +4,15 @@ meta {
   seq: 1
 }
 post {
-  url: http://localhost:8080/payroll.php?action=generate
+  url: http://localhost:8080/?page=payroll/index
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
-  periode_bulan: 09
-  periode_tahun: 2026
+  bulan: 09
+  tahun: 2026
 }
+
 tests {
   test("Admin boleh generate gaji", function() {
     expect(res.getStatus()).to.be.oneOf([200, 302]);

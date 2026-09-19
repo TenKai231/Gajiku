@@ -4,14 +4,17 @@ meta {
   seq: 3
 }
 post {
-  url: http://localhost:8080/payroll.php?action=generate
+  url: http://localhost:8080/?action=payroll/process
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
-  periode_bulan: 15
-  periode_tahun: ABCD
+  bulan: 15
+  tahun: ABCD
+  simpan_sebagai_draft: 0
+  mode_koreksi: 0
 }
+
 tests {
   test("Validasi menolak input invalid", function() {
     expect(res.getStatus()).to.equal(200);

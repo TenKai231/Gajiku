@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/jabatan.php?action=create
+  url: http://localhost:8080/?action=jabatan/store
   body: formUrlEncoded
   auth: none
 }
@@ -13,8 +13,9 @@ post {
 body:form-urlencoded {
   nama_jabatan: Manager IT
   gaji_pokok: 12000000
-  tunjangan: 3000000
+  tunjangan_default: 3000000
 }
+
 
 tests {
   test("Validasi constraint duplicate/unik mencegah insert", function() {

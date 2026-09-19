@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/jabatan.php?action=create
+  url: http://localhost:8080/?action=jabatan/store
   body: formUrlEncoded
   auth: none
 }
@@ -13,8 +13,9 @@ post {
 body:form-urlencoded {
   nama_jabatan: 
   gaji_pokok: 
-  tunjangan: 
+  tunjangan_default: 
 }
+
 
 tests {
   test("Validasi menghentikan proses (Status 200, tidak redirect)", function() {

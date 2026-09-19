@@ -4,13 +4,14 @@ meta {
   seq: 1
 }
 post {
-  url: http://localhost:8080/absensi.php?action=delete
+  url: http://localhost:8080/?action=absensi/delete
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
   id: 1
 }
+
 tests {
   test("Berhasil hapus", function() {
     expect(res.getStatus()).to.be.oneOf([200, 302]);

@@ -4,14 +4,17 @@ meta {
   seq: 2
 }
 post {
-  url: http://localhost:8080/payroll.php?action=generate
+  url: http://localhost:8080/?action=payroll/process
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
-  periode_bulan: 
-  periode_tahun: 
+  bulan: 
+  tahun: 
+  simpan_sebagai_draft: 0
+  mode_koreksi: 0
 }
+
 tests {
   test("Validasi menghentikan proses", function() {
     expect(res.getStatus()).to.equal(200);

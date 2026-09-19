@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/jabatan.php?action=create
+  url: http://localhost:8080/?action=jabatan/store
   body: formUrlEncoded
   auth: none
 }
@@ -13,8 +13,9 @@ post {
 body:form-urlencoded {
   nama_jabatan: Staff IT
   gaji_pokok: -500000
-  tunjangan: -100000
+  tunjangan_default: -100000
 }
+
 
 tests {
   test("Validasi angka menolak nilai minus", function() {

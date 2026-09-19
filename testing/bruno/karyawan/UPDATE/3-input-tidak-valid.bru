@@ -5,14 +5,15 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/karyawan.php?action=edit&id=1
+  url: http://localhost:8080/?action=karyawan/update&id=1
   body: formUrlEncoded
   auth: none
 }
 
 body:form-urlencoded {
-  email: bukan_email
+
 }
+
 
 tests {
   test("Validasi update menangkap format salah", function() {

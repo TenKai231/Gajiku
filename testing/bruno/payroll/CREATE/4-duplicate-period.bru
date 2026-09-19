@@ -4,14 +4,17 @@ meta {
   seq: 4
 }
 post {
-  url: http://localhost:8080/payroll.php?action=generate
+  url: http://localhost:8080/?action=payroll/process
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
-  periode_bulan: 08
-  periode_tahun: 2026
+  bulan: 08
+  tahun: 2026
+  simpan_sebagai_draft: 0
+  mode_koreksi: 0
 }
+
 tests {
   test("Gagal generate karena periode ini sudah di-generate sebelumnya", function() {
     expect(res.getStatus()).to.be.oneOf([200, 302]);

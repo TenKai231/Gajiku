@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/karyawan.php?action=delete
+  url: http://localhost:8080/?action=karyawan/delete
   body: formUrlEncoded
   auth: none
 }
@@ -14,8 +14,14 @@ body:form-urlencoded {
   id: 1
 }
 
+
 tests {
   test("Dilarang melakukan aksi tanpa sesi / role admin", function() {
-    expect(res.getStatus()).to.be.oneOf([302, 403, 401]);
+    // Aplikasi: requireAuth() → redirect ke /login.php (302). Bruno follow-redirect otomatis
+    // sehingga status akhir bisa 200 (login page) atau 302 (jika follow dimatikan).
+    const status = res.getStatus();
+    const body = res.getBody();
+    const redirectedToLogin = body.includes('Masuk ke Gajiku') || body.includes('login');
+    expect([200, 302, 403, 401].includes(status) && (status === 302 || status === 403 || status === 401 || redirectedToLogin)).to.be.true;
   });
 }

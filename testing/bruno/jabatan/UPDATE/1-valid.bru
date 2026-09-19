@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/jabatan.php?action=edit&id=1
+  url: http://localhost:8080/?action=jabatan/update&id=1
   body: formUrlEncoded
   auth: none
 }
@@ -13,8 +13,9 @@ post {
 body:form-urlencoded {
   nama_jabatan: Manager IT (Updated)
   gaji_pokok: 15000000
-  tunjangan: 3500000
+  tunjangan_default: 3500000
 }
+
 
 tests {
   test("Update berhasil dan redirect", function() {

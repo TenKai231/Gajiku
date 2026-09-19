@@ -5,19 +5,22 @@ meta {
 }
 
 post {
-  url: http://localhost:8080/karyawan.php?action=create
+  url: http://localhost:8080/?action=karyawan/store
   body: formUrlEncoded
   auth: none
 }
 
 body:form-urlencoded {
   nip: EMP-001
-  nama_lengkap: Budi Santoso
-  email: budi@gajiku.local
+  nama: Budi Santoso
   jabatan_id: 1
   tanggal_masuk: 2026-01-10
   status: Aktif
+  jenis_kelamin: L
+  tanggal_lahir: 1990-01-01
+  golongan_id: 1
 }
+
 
 tests {
   test("Redirect (302) atau sukses (200) kembali ke index saat valid", function() {

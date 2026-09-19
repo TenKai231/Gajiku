@@ -4,15 +4,17 @@ meta {
   seq: 2
 }
 post {
-  url: http://localhost:8080/absensi.php?action=create
+  url: http://localhost:8080/?action=absensi/store
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
   karyawan_id: 
   tanggal: 
-  status_absensi: 
+  status: 
+  keterangan: 
 }
+
 tests {
   test("Validasi menghentikan proses", function() {
     expect(res.getStatus()).to.equal(200);

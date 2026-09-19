@@ -4,15 +4,17 @@ meta {
   seq: 4
 }
 post {
-  url: http://localhost:8080/absensi.php?action=create
+  url: http://localhost:8080/?action=absensi/store
   body: formUrlEncoded
   auth: none
 }
 body:form-urlencoded {
   karyawan_id: 1
   tanggal: 2026-08-31
-  status_absensi: Sakit
+  status: Sakit
+  keterangan: 
 }
+
 tests {
   test("Validasi constraint mencegah duplicate absen harian", function() {
     expect(res.getStatus()).to.equal(200);
